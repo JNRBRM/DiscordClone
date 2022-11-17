@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscordClone.Api", "Discord
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscordClone.CoreLib", "DiscordClone.CoreLib\DiscordClone.CoreLib.csproj", "{7655FF4F-9665-456B-A8DF-69344166C573}"
 EndProject
-Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "discordclone.webapp", "DiscordClone.WebApp\discordclone.webapp.esproj", "{2826D90E-4687-4015-BB9F-0CB2201ED6F3}"
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "DiscordClone.WebApp", "DiscordClone.WebApp\DiscordClone.WebApp.esproj", "{2826D90E-4687-4015-BB9F-0CB2201ED6F3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
