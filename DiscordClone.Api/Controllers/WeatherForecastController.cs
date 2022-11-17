@@ -1,3 +1,4 @@
+using DiscordClone.Api.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DiscordClone.Api.Controllers
@@ -16,6 +17,7 @@ namespace DiscordClone.Api.Controllers
         public WeatherForecastController(ILogger<WeatherForecastController> logger)
         {
             _logger = logger;
+            var e = new Entity<int>();
         }
 
         [HttpGet(Name = "GetWeatherForecast")]
