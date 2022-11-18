@@ -1,6 +1,6 @@
 ﻿namespace DiscordClone.Api.Entities
 {
-    public class RolePermission
+    public class AccountImage : BaseImage
     {
     }
 }

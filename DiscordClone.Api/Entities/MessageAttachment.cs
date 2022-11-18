@@ -1,6 +1,6 @@
 ﻿namespace DiscordClone.Api.Entities
 {
-    public class MessageAttachment : Entity<int>
+    public class MessageAttachment : BaseEntity<int>
     {
         public int MessageId { get; set; }
         public AttachmentType Type { get; set; }  

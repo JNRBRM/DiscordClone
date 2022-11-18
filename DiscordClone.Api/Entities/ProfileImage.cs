@@ -1,6 +1,6 @@
 ﻿namespace DiscordClone.Api.Entities
 {
-    public class ChatRoom
+    public class ProfileImage : BaseImage
     {
     }
 }

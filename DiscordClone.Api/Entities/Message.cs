@@ -1,21 +1,15 @@
 ﻿namespace DiscordClone.Api.Entities
 {
-    public class Message : Entity<int>
+    public class Message : BaseEntity<int>
     {
-        public string Content { get; set; }
-
-        public List<MessageAttachment> MessageAttachments { get; set; }
-
-        public Guid ChatRoomId { get; set; }
-
-        public ChatRoom ChatRoom { get; set; }
-
+        public Guid ChatId { get; set; }
         public int AccountId { get; set; }
-
+        public string Content { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public DateTime? EditedDate { get; set; }
+        public List<MessageAttachment> MessageAttachments { get; set; }
+        public Chat Chat { get; set; }
         public Account Account { get; set; }
 
-        public DateTime CreatedDate { get; set; }
-
-        public DateTime? EditedDate { get; set; }
     }
 }

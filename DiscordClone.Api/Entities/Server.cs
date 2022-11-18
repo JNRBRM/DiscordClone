@@ -1,6 +1,6 @@
 ﻿namespace DiscordClone.Api.Entities
 {
-    public class Server : Entity<Guid>
+    public class Server : BaseEntity<Guid>
     {
         public Guid UserId { get; set; }
         public string Name { get; set; }
