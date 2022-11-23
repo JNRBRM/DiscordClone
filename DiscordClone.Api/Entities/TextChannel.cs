@@ -4,6 +4,6 @@
     {
         //add mute sometime ye
         public List<TextChannelSetting> TextChannelSettings { get; set; }
-        public List<Message> Messages { get; set; }
+        public List<TextChannelMessage> Messages { get; set; }
     }
 }

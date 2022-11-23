@@ -8,7 +8,8 @@
         public DateTime CreatedDate { get; set; }
         public DateTime? LastLogonDate { get; set; }
         public List<Friend> Friends { get; set; }
-        public List<Message> Messages { get; set; }
+        //public List<Message> Messages { get; set; }
+       // public List<ChatMessage> Messages { get; set; }
         public List<AccountChat> Chats { get; set; }
         public List<ServerProfile> ServerProfiles { get; set; }
         public AccountImage Image { get; set; }

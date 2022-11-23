@@ -1,6 +1,6 @@
 ﻿namespace DiscordClone.Api.Entities
 {
-    public class Friend :BaseEntity<int>
+    public class Friend : BaseEntity<int>
     {
         public int AccountId1 { get; set; }
         public int AccountId2 { get; set; }
