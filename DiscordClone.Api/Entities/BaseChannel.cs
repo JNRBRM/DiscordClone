@@ -6,7 +6,7 @@
         public string Name { get; set; }
 
         public bool IsAgeRestricted { get; set; }
-        public List<Account> Accounts { get; set; }
+        public List<ServerProfile> ServerProfile { get; set; }
         public Server Server { get; set; }
     }
 }

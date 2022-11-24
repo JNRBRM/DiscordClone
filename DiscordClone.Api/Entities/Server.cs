@@ -6,7 +6,7 @@
         public string Name { get; set; }
         public DateTime CreatedDate { get; set; }
 
-        public List<ServerProfile> Accounts { get; set; }
+        public List<ServerProfile> ServerProfiles { get; set; }
         public List<Role> Roles { get; set; }
 
         public List<TextChannel> TextChannels { get; set; }

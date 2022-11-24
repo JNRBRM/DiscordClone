@@ -1,5 +1,6 @@
 ﻿using DiscordClone.Api.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using System;
 using System.Collections.Generic;
 
@@ -9,7 +10,7 @@ namespace DiscordClone.Api.DBContext
     {
         public DiscordCloneContext(DbContextOptions<DiscordCloneContext> options) : base(options) { }
 
-        #region DbSet
+        #region DbSets
         public DbSet<Account> Accounts { get; set; }
         public DbSet<AccountImage> AccountImages { get; set; }
         public DbSet<ChannelPermission> ChannelPermissions { get; set; }
@@ -44,10 +45,19 @@ namespace DiscordClone.Api.DBContext
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
+            optionsBuilder
+                .ConfigureWarnings(wa => wa.Ignore(RelationalEventId.ForeignKeyPropertiesMappedToUnrelatedTables));
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            #region Ignore Entity
+            modelBuilder.Ignore<BaseChannel>();
+            //modelBuilder.Ignore<BasePermission>();
+            #endregion
+
+            #region Add Entity
             modelBuilder.Entity<Account>(model =>
             {
                 model.HasKey(x => x.Id);
@@ -56,15 +66,18 @@ namespace DiscordClone.Api.DBContext
                 model.Property(x => x.CreatedDate).HasDefaultValueSql("getdate()").IsRequired();
                 model.Property(x => x.LastLogonDate).HasDefaultValue(null);
 
-                //model.HasMany(x=>x.Messages).WithOne(x=>x.Account).HasForeignKey(x=>x.AccountId);
                 model.HasMany(x=>x.Chats).WithOne(x=>x.Account).HasForeignKey(x=>x.AccountId);
                 model.HasMany(x=>x.ServerProfiles).WithOne(x=>x.Account).HasForeignKey(x=>x.AccountId);
-                //model.HasOne(x=>x.Image).WithOne().HasForeignKey(x=>x.AccountId);
-                model.HasOne(x=>x.Image).WithOne().HasForeignKey<Account>(x=>x.AccountImageId);
+                model.HasMany(x => x.Friends).WithOne(x => x.Account1).HasForeignKey(x => x.AccountId1);
+
+                model.HasOne(x => x.User).WithOne(x => x.Account).HasForeignKey<Account>(x => x.UserId);
+                model.HasOne(x => x.Image).WithOne().HasForeignKey<Account>(x => x.AccountImageId);
+
             });
             modelBuilder.Entity<Account>().ToTable("Accounts");
             modelBuilder.Entity<AccountImage>(model =>
             {
+                //model.Property(x => x.Id).UseIdentityColumn(1,4);
                 model.HasKey(x => x.Id);
                 model.Property(x=>x.Bytes).HasMaxLength(4000).IsRequired();
                 model.Property(x=>x.FileExtension).HasMaxLength(4).IsRequired();
@@ -73,34 +86,34 @@ namespace DiscordClone.Api.DBContext
             modelBuilder.Entity<AccountImage>().ToTable("AccountImages");
             modelBuilder.Entity<ChannelPermission>(model =>
             {
-                model.HasKey(x => x.Id);
-
+                model.Property(x => x.Id).UseIdentityColumn(1,4);
+                //model.HasKey(x => x.Id);
                 model.Property(x => x.Action).HasMaxLength(64).IsRequired();
                 model.Property(x => x.Description).HasMaxLength(96).IsRequired();
             });
             modelBuilder.Entity<ChannelPermission>().ToTable("ChannelPermissions");
             modelBuilder.Entity<Chat>(model =>
             {
+                // model.Property(x => x.Id).UseIdentityColumn(1,4);
                 model.HasKey(x => x.Id);
-
                 model.Property(x => x.CreatedDate).HasDefaultValueSql("getdate()").IsRequired();
-                model.HasMany(x=>x.Messages).WithOne(x=>x.Chat).HasForeignKey(x=>x.ChatId);
-                model.HasMany(x=>x.Accounts).WithOne(x=>x.Chat).HasForeignKey(x=>x.ChatId);
+                model.HasMany(x => x.Messages).WithOne(x => x.Chat).HasForeignKey(x => x.ChatId);
+                model.HasMany(x => x.Accounts).WithOne(x => x.Chat).HasForeignKey(x => x.ChatId);
             });
             modelBuilder.Entity<Chat>().ToTable("Chats");
             modelBuilder.Entity<Friend>()
-                .HasOne(fs => fs.Account1)
+                .HasOne(x => x.Account1)
                 .WithMany()
-                .HasForeignKey(fs => fs.AccountId1);
-
+                .HasForeignKey(x => x.AccountId1)
+                .OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<Friend>()
-                .HasOne(fs => fs.Account2)
+                .HasOne(x => x.Account2)
                 .WithMany()
-                .HasForeignKey(fs => fs.AccountId2);
+                .HasForeignKey(x => x.AccountId2);
 
             modelBuilder.Entity<Friend>(model =>
             {
-                model.HasKey(x => x.Id);
+                model.Property(x => x.Id).UseIdentityColumn(1,4);
                 model.Property(x => x.Status).HasConversion<int>().IsRequired();
                 model.Property(x => x.SentDate).HasDefaultValueSql("getdate()").IsRequired();
             });
@@ -118,7 +131,7 @@ namespace DiscordClone.Api.DBContext
 
             modelBuilder.Entity<ChatMessage>(model =>
             {
-                model.HasKey(x => x.Id);
+                model.Property(x => x.Id).UseIdentityColumn(1, 4);
                 model.Property(x => x.Content).HasMaxLength(2000).IsRequired();
                 model.Property(x => x.CreatedDate).HasDefaultValueSql("getdate()").IsRequired();
                 model.Property(x => x.EditedDate).HasDefaultValueSql("getdate()").IsRequired();
@@ -134,7 +147,7 @@ namespace DiscordClone.Api.DBContext
 
             modelBuilder.Entity<GroupChatMessageAttachment>(model =>
             {
-                model.HasKey(x =>  x.Id);
+                model.Property(x => x.Id).UseIdentityColumn(1, 4);
                 model.Property(x => x.Type).HasConversion<int>().IsRequired();
                 model.Property(x => x.FileLocation).HasMaxLength(256).IsRequired();
                 model.HasOne(x => x.Message).WithMany(x => (IEnumerable<GroupChatMessageAttachment>)x.MessageAttachments).HasForeignKey(x => x.MessageId);
@@ -142,7 +155,7 @@ namespace DiscordClone.Api.DBContext
             modelBuilder.Entity<GroupChatMessageAttachment>().ToTable("GroupChatMessageAttachments");
             modelBuilder.Entity<ChatMessageAttachment>(model =>
             {
-                model.HasKey(x => x.Id);
+                model.Property(x => x.Id).UseIdentityColumn(1,4);
                 model.Property(x => x.Type).HasConversion<int>().IsRequired();
                 model.Property(x => x.FileLocation).HasMaxLength(256).IsRequired();
                 model.HasOne(x => x.Message).WithMany(x => (IEnumerable<ChatMessageAttachment>)x.MessageAttachments).HasForeignKey(x => x.MessageId);
@@ -151,7 +164,7 @@ namespace DiscordClone.Api.DBContext
 
             modelBuilder.Entity<TextChannelMessageAttachment>(model =>
             {
-                //model.HasKey(x => x.Id);
+                model.Property(x => x.Id).UseIdentityColumn(1,4);
                 model.Property(x => x.Type).HasConversion<int>().IsRequired();
                 model.Property(x => x.FileLocation).HasMaxLength(256).IsRequired();
                 model.HasOne(x => x.Message).WithMany(x => (IEnumerable<TextChannelMessageAttachment>)x.MessageAttachments).HasForeignKey(x => x.MessageId);
@@ -160,7 +173,7 @@ namespace DiscordClone.Api.DBContext
 
             //modelBuilder.Entity<MessageAttachment>(model =>
             //{
-            //    model.HasKey(x => x.Id);
+            //    model.Property(x => x.Id).UseIdentityColumn(1,4);
             //    model.Property(x => x.Type).HasConversion<int>().IsRequired();
             //    model.Property(x => x.FileLocation).HasMaxLength(256).IsRequired();
             //    model.HasOne(x => x.Message).WithMany(x => x.MessageAttachments).HasForeignKey(x => x.MessageId);
@@ -169,7 +182,7 @@ namespace DiscordClone.Api.DBContext
 
             modelBuilder.Entity<PreviousRegisteredEmailLookup>(model =>
             {
-                model.HasKey(x => x.Id);
+                model.Property(x => x.Id).UseIdentityColumn(1,4);
                 model.Property(x => x.EmailHash).HasMaxLength(256).IsRequired();
                 model.Property(x => x.Salt).HasMaxLength(100).IsRequired();
                 model.HasMany(x => x.Questions).WithOne(x => x.Lookup).HasForeignKey(x => x.LookupId);
@@ -178,7 +191,7 @@ namespace DiscordClone.Api.DBContext
             modelBuilder.Entity<PreviousRegisteredEmailLookup>().ToTable("PreviousRegisteredEmailLookups");
             modelBuilder.Entity<ProfileImage>(model =>
             {
-                model.HasKey(x => x.Id);
+                model.Property(x => x.Id).UseIdentityColumn(1,4);
                 model.Property(x => x.Bytes).HasMaxLength(4000).IsRequired();
                 model.Property(x => x.FileExtension).HasMaxLength(4).IsRequired();
                 model.Property(x => x.Size).IsRequired();
@@ -187,7 +200,7 @@ namespace DiscordClone.Api.DBContext
 
             modelBuilder.Entity<Role>(model =>
             {
-                model.HasKey(x => x.Id);
+                model.Property(x => x.Id).UseIdentityColumn(1,4);
                 model.Property(x=>x.Name).HasMaxLength(64).IsRequired();
                 model.Property(x => x.Description).HasMaxLength(100).IsRequired();
                 model.Property(x => x.CreatedDate).HasDefaultValueSql("getdate()").IsRequired();
@@ -204,7 +217,7 @@ namespace DiscordClone.Api.DBContext
             modelBuilder.Entity<Role>().ToTable("Roles");
             modelBuilder.Entity<RoleGeneralChannelPermission>(model =>
             {
-                model.HasKey(x => x.Id);
+                model.Property(x => x.Id).UseIdentityColumn(1,4);
                 model.HasOne(x => x.Role).WithMany(x=>x.RoleGeneralChannelPermission).HasForeignKey(x => x.RoleId);
                 model.HasOne(x => x.Permission).WithOne().HasForeignKey<RoleGeneralChannelPermission>(x => x.PermissionId);
 
@@ -217,21 +230,21 @@ namespace DiscordClone.Api.DBContext
             modelBuilder.Entity<RoleGeneralChannelPermission>().ToTable("RoleGeneralChannelPermissions");
             modelBuilder.Entity<RoleGeneralServerPermission>(model =>
             {
-                model.HasKey(x => x.Id);
+                model.Property(x => x.Id).UseIdentityColumn(1,4);
                 model.HasOne(x => x.Role).WithMany(x => x.RoleGeneralServerPermission).HasForeignKey(x => x.RoleId);
                 model.HasOne(x => x.Permission).WithOne().HasForeignKey<RoleGeneralServerPermission>(x => x.PermissionId);
             });
             modelBuilder.Entity<RoleGeneralServerPermission>().ToTable("RoleGeneralServerPermissions");
             modelBuilder.Entity<RoleMembershipPermission>(model =>
             {
-                model.HasKey(x => x.Id);
+                model.Property(x => x.Id).UseIdentityColumn(1,4);
                 model.HasOne(x => x.Role).WithMany(x => x.RoleMembershipPermission).HasForeignKey(x => x.RoleId);
                 model.HasOne(x => x.Permission).WithOne().HasForeignKey<RoleMembershipPermission>(x => x.PermissionId);
             });
             modelBuilder.Entity<RoleMembershipPermission>().ToTable("RoleMembershipPermissions");
             modelBuilder.Entity<RoleTextChannelPermission>(model =>
             {
-                model.HasKey(x => x.Id);
+                model.Property(x => x.Id).UseIdentityColumn(1,4);
                 model.HasOne(x => x.Role).WithMany(x => x.RoleTextChannelPermission).HasForeignKey(x => x.RoleId);
                 model.HasOne(x => x.Permission).WithOne().HasForeignKey<RoleTextChannelPermission>(x => x.PermissionId);
 
@@ -244,7 +257,7 @@ namespace DiscordClone.Api.DBContext
             modelBuilder.Entity<RoleTextChannelPermission>().ToTable("RoleTextChannelPermissions");
             modelBuilder.Entity<RoleVoiceChannelPermission>(model =>
             {
-                model.HasKey(x => x.Id);
+                model.Property(x => x.Id).UseIdentityColumn(1,4);
                 model.HasOne(x => x.Role).WithMany(x => x.RoleVoiceChannelPermission).HasForeignKey(x => x.RoleId);
                 model.HasOne(x => x.Permission).WithOne().HasForeignKey<RoleVoiceChannelPermission>(x => x.PermissionId);
 
@@ -265,7 +278,7 @@ namespace DiscordClone.Api.DBContext
             modelBuilder.Entity<SecurityCredentials>().ToTable("SecurityCredentials");
             modelBuilder.Entity<SecurityQuestion>(model =>
             {
-                model.HasKey(x => x.Id);
+                model.Property(x => x.Id).UseIdentityColumn(1,4);
                 model.Property(x=>x.Question).HasMaxLength(100).IsRequired();
                 model.Property(x=>x.Answer).HasMaxLength(100).IsRequired();
                 model.HasOne(x => x.Lookup).WithMany(x => x.Questions).HasForeignKey(x => x.LookupId);
@@ -274,10 +287,10 @@ namespace DiscordClone.Api.DBContext
 
             modelBuilder.Entity<Server>(model =>
             {
-                model.HasKey(x => x.Id);
+                model.Property(x => x.Id).UseIdentityColumn(1,4);
                 model.Property(x=>x.Name).HasMaxLength(100).IsRequired();
                 model.Property(x => x.CreatedDate).HasDefaultValueSql("getdate()").IsRequired();
-                model.HasMany(x => x.Accounts).WithOne(x=>x.Server).HasForeignKey(x => x.ServerId);
+                model.HasMany(x => x.ServerProfiles).WithOne(x=>x.Server).HasForeignKey(x => x.ServerId);
                 model.HasMany(x => x.Roles).WithOne(x => x.Server).HasForeignKey(x => x.ServerId);
                 model.HasMany(x => x.TextChannels).WithOne(x=>x.Server).HasForeignKey(x=>x.ServerId);
                 model.HasMany(x => x.VoiceChannels).WithOne(x => x.Server).HasForeignKey(x => x.ServerId);
@@ -288,25 +301,26 @@ namespace DiscordClone.Api.DBContext
 
             modelBuilder.Entity<ServerPermission>(model =>
             {
-                model.HasKey(x => x.Id);
+                model.Property(x => x.Id).UseIdentityColumn(1,4);
                 model.Property(x => x.Action).HasMaxLength(64).IsRequired();
                 model.Property(x => x.Description).HasMaxLength(96).IsRequired();
             });
             modelBuilder.Entity<ServerPermission>().ToTable("ServerPermissions");
             modelBuilder.Entity<ServerProfile>(model =>
             {
-                model.HasKey(x => x.Id);
+                model.Property(x => x.Id).UseIdentityColumn(1,4);
                 model.Property(x=>x.NickName).HasMaxLength(32).IsRequired();
                 model.HasOne(x => x.Image).WithOne().HasForeignKey<ServerProfile>(x => x.ProfileImageId);
                 model.HasOne(x => x.Account).WithMany().HasForeignKey(x => x.AccountId);
-                model.HasOne(x => x.Server).WithMany(x=>x.Accounts).HasForeignKey(x => x.ServerId);
+                model.HasOne(x => x.Server).WithMany(x=>x.ServerProfiles).HasForeignKey(x => x.ServerId)
+                .OnDelete(DeleteBehavior.Restrict);
             });
             modelBuilder.Entity<ServerProfile>().ToTable("ServerProfiles");
             modelBuilder.Entity<TextChannel>(model =>
             {
-                model.HasKey(x => x.Id);
+                model.Property(x => x.Id).UseIdentityColumn(1,4);
 
-                model.HasMany(x => x.Accounts);
+                model.HasMany(x => x.ServerProfile).WithMany();
                 model.HasOne(x => x.Server).WithMany(x=>x.TextChannels).HasForeignKey(x => x.ServerId);
                 model.Property(x => x.Name).HasMaxLength(100).IsRequired();
                 model.Property(x => x.IsAgeRestricted).HasDefaultValue(false).IsRequired();
@@ -317,17 +331,17 @@ namespace DiscordClone.Api.DBContext
             modelBuilder.Entity<TextChannel>().ToTable("TextChannels");
             modelBuilder.Entity<TextChannelSetting>(model =>
             {
-                //model.HasKey(x => x.Id);
+                model.Property(x => x.Id).UseIdentityColumn(1,4);
                 model.Property(x => x.Name).HasMaxLength(100).IsRequired();
                 model.Property(x => x.Parameter).HasMaxLength(100).IsRequired();
                 model.Property(x => x.Description).HasMaxLength(100).IsRequired();
-                model.HasOne(x => x.Channel).WithMany().HasForeignKey(x=>x.ChannelId);
+                //model.HasOne(x => x.Channel).WithMany().HasForeignKey(x=>x.ChannelId);
 
              });
             modelBuilder.Entity<TextChannelSetting>().ToTable("TextChannelSettings");
             modelBuilder.Entity<User>(model =>
             {
-                //model.HasKey(x => x.Id);
+                //model.Property(x => x.Id).UseIdentityColumn(1,4);
                 model.Property(x=>x.Email).HasMaxLength(100).IsRequired();
                 model.Property(x=>x.PhoneNumber).HasMaxLength(10).IsRequired();
                 model.Property(x=>x.EmailConfirmed).HasDefaultValue(false).IsRequired();
@@ -338,9 +352,9 @@ namespace DiscordClone.Api.DBContext
             modelBuilder.Entity<User>().ToTable("Users");
             modelBuilder.Entity<VoiceChannel>(model =>
             {
-                //model.HasKey(x => x.Id);
+                model.Property(x => x.Id).UseIdentityColumn(1,4);
 
-                model.HasMany(x => x.Accounts);
+                //model.HasMany(x => x.ServerProfile).WithMany();
                 model.HasOne(x => x.Server).WithMany(x=>x.VoiceChannels).HasForeignKey(x => x.ServerId);
                 model.Property(x => x.Name).HasMaxLength(100).IsRequired();
                 model.Property(x => x.IsAgeRestricted).HasDefaultValue(false).IsRequired();
@@ -349,14 +363,15 @@ namespace DiscordClone.Api.DBContext
             modelBuilder.Entity<VoiceChannel>().ToTable("VoiceChannels");
             modelBuilder.Entity<VoiceChannelSetting>(model =>
             {
-                //model.HasKey(x => x.Id);
+                //model.Property(x => x.Id).UseIdentityColumn(1,4);
                 model.Property(x => x.Name).HasMaxLength(100).IsRequired();
                 model.Property(x => x.Parameter).HasMaxLength(100).IsRequired();
                 model.Property(x => x.Description).HasMaxLength(100).IsRequired();
-                model.HasOne(x => x.Channel).WithMany().HasForeignKey(x => x.ChannelId);
+               // model.HasOne(x => x.Channel).WithMany().HasForeignKey(x => x.ChannelId);
 
             });
-            modelBuilder.Entity<VoiceChannelSetting>().ToTable("TextChannelSettings");
+            modelBuilder.Entity<VoiceChannelSetting>().ToTable("VoiceChannelSettings");
+            #endregion
         }
     }
 }
