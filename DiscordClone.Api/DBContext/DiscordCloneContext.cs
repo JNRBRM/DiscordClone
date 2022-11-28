@@ -131,7 +131,8 @@ namespace DiscordClone.Api.DBContext
 
             modelBuilder.Entity<ChatMessage>(model =>
             {
-                model.Property(x => x.Id).UseIdentityColumn(1, 4);
+               // model.Property(x => x.Id).UseIdentityColumn(1, 4);
+                model.HasKey(x => x.Id);
                 model.Property(x => x.Content).HasMaxLength(2000).IsRequired();
                 model.Property(x => x.CreatedDate).HasDefaultValueSql("getdate()").IsRequired();
                 model.Property(x => x.EditedDate).HasDefaultValueSql("getdate()").IsRequired();
@@ -150,7 +151,7 @@ namespace DiscordClone.Api.DBContext
                 model.Property(x => x.Id).UseIdentityColumn(1, 4);
                 model.Property(x => x.Type).HasConversion<int>().IsRequired();
                 model.Property(x => x.FileLocation).HasMaxLength(256).IsRequired();
-                model.HasOne(x => x.Message).WithMany(x => (IEnumerable<GroupChatMessageAttachment>)x.MessageAttachments).HasForeignKey(x => x.MessageId);
+                model.HasOne(x => x.Message).WithMany(x => x.MessageAttachments).HasForeignKey(x => x.MessageId);
             });
             modelBuilder.Entity<GroupChatMessageAttachment>().ToTable("GroupChatMessageAttachments");
             modelBuilder.Entity<ChatMessageAttachment>(model =>
