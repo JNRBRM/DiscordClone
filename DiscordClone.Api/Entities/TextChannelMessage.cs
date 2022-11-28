@@ -1,6 +1,6 @@
 ﻿namespace DiscordClone.Api.Entities
 {
-    public class TextChannelMessage:Message<TextChannel,int>
+    public class TextChannelMessage:BaseMessage<TextChannel,int>
     {
     }
 }

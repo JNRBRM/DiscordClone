@@ -1,6 +1,6 @@
 ﻿namespace DiscordClone.Api.Entities
 {
-    public class GroupChatMessageAttachment:MessageAttachment<GroupChat, Guid>
+    public class GroupChatMessageAttachment:BaseMessageAttachment<GroupChat, Guid>
     {
     }
 }

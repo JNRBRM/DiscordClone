@@ -1,6 +1,6 @@
 ﻿namespace DiscordClone.Api.Entities
 {
-    public class GroupChatMessage: Message<GroupChat,Guid>
+    public class GroupChatMessage: BaseMessage<GroupChat,Guid>
     {
     }
 }

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DiscordClone.Api.Migrations
 {
     [DbContext(typeof(DiscordCloneContext))]
-    [Migration("20221124111730_Initial[1]")]
-    partial class Initial1
+    [Migration("20221128083155_initial_migration")]
+    partial class initialmigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,28 +25,54 @@ namespace DiscordClone.Api.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("AccountRole", b =>
-                {
-                    b.Property<int>("AccountsId")
-                        .HasColumnType("int");
+            modelBuilder.HasSequence("AccountImageSequence");
 
-                    b.Property<int>("RoleId")
-                        .HasColumnType("int");
+            modelBuilder.HasSequence("AccountSequence");
 
-                    b.HasKey("AccountsId", "RoleId");
+            modelBuilder.HasSequence("BaseChannelSequence");
 
-                    b.HasIndex("RoleId");
+            modelBuilder.HasSequence("BasePermissionSequence");
 
-                    b.ToTable("AccountRole");
-                });
+            modelBuilder.HasSequence("FriendSequence");
+
+            modelBuilder.HasSequence("MessageAttachmentSequence");
+
+            modelBuilder.HasSequence("MessageSequence");
+
+            modelBuilder.HasSequence("PreviousRegisteredEmailLookupSequence");
+
+            modelBuilder.HasSequence("ProfileImageSequence");
+
+            modelBuilder.HasSequence("RoleGeneralChannelPermissionSequence");
+
+            modelBuilder.HasSequence("RoleGeneralServerPermissionSequence");
+
+            modelBuilder.HasSequence("RoleMembershipPermissionSequence");
+
+            modelBuilder.HasSequence("RoleSequence");
+
+            modelBuilder.HasSequence("RoleTextChannelPermissionSequence");
+
+            modelBuilder.HasSequence("RoleVoiceChannelPermissionSequence");
+
+            modelBuilder.HasSequence("SecurityQuestionSequence");
+
+            modelBuilder.HasSequence("ServerProfileSequence");
+
+            modelBuilder.HasSequence("ServerSequence");
+
+            modelBuilder.HasSequence("TextChannelSettingSequence");
+
+            modelBuilder.HasSequence("VoiceChannelSettingSequence");
 
             modelBuilder.Entity("DiscordClone.Api.Entities.Account", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasDefaultValueSql("NEXT VALUE FOR [AccountSequence]");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseSequence(b.Property<int>("Id"));
 
                     b.Property<int>("AccountImageId")
                         .HasColumnType("int");
@@ -64,15 +90,25 @@ namespace DiscordClone.Api.Migrations
                     b.Property<DateTime?>("LastLogonDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("RoleId")
+                        .HasColumnType("int");
+
                     b.Property<Guid?>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AccountImageId")
-                        .IsUnique();
+                    b.HasIndex("AccountImageId");
+
+                    b.HasIndex("RoleId");
+
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
 
                     b.ToTable("Accounts", (string)null);
+
+                    b.UseTpcMappingStrategy();
                 });
 
             modelBuilder.Entity("DiscordClone.Api.Entities.AccountChat", b =>
@@ -102,9 +138,10 @@ namespace DiscordClone.Api.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasDefaultValueSql("NEXT VALUE FOR [AccountImageSequence]");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseSequence(b.Property<int>("Id"));
 
                     b.Property<byte[]>("Bytes")
                         .IsRequired()
@@ -122,15 +159,47 @@ namespace DiscordClone.Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AccountImages", (string)null);
+
+                    b.UseTpcMappingStrategy();
+                });
+
+            modelBuilder.Entity("DiscordClone.Api.Entities.BaseChannel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValueSql("NEXT VALUE FOR [BaseChannelSequence]");
+
+                    SqlServerPropertyBuilderExtensions.UseSequence(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsAgeRestricted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("ServerId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable((string)null);
+
+                    b.UseTpcMappingStrategy();
                 });
 
             modelBuilder.Entity("DiscordClone.Api.Entities.BasePermission", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasDefaultValueSql("NEXT VALUE FOR [BasePermissionSequence]");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 4);
+                    SqlServerPropertyBuilderExtensions.UseSequence(b.Property<int>("Id"));
 
                     b.Property<string>("Action")
                         .IsRequired()
@@ -144,9 +213,9 @@ namespace DiscordClone.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BasePermission");
+                    b.ToTable((string)null);
 
-                    b.UseTptMappingStrategy();
+                    b.UseTpcMappingStrategy();
                 });
 
             modelBuilder.Entity("DiscordClone.Api.Entities.Chat", b =>
@@ -163,15 +232,18 @@ namespace DiscordClone.Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Chats", (string)null);
+
+                    b.UseTpcMappingStrategy();
                 });
 
             modelBuilder.Entity("DiscordClone.Api.Entities.Friend", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasDefaultValueSql("NEXT VALUE FOR [FriendSequence]");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 4);
+                    SqlServerPropertyBuilderExtensions.UseSequence(b.Property<int>("Id"));
 
                     b.Property<int?>("AccountId")
                         .HasColumnType("int");
@@ -199,6 +271,8 @@ namespace DiscordClone.Api.Migrations
                     b.HasIndex("AccountId2");
 
                     b.ToTable("Friends", (string)null);
+
+                    b.UseTpcMappingStrategy();
                 });
 
             modelBuilder.Entity("DiscordClone.Api.Entities.GroupChat", b =>
@@ -220,6 +294,8 @@ namespace DiscordClone.Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("GroupChats", (string)null);
+
+                    b.UseTpcMappingStrategy();
                 });
 
             modelBuilder.Entity("DiscordClone.Api.Entities.GroupChatAccount", b =>
@@ -253,9 +329,10 @@ namespace DiscordClone.Api.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasDefaultValueSql("NEXT VALUE FOR [MessageSequence]");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 4);
+                    SqlServerPropertyBuilderExtensions.UseSequence(b.Property<int>("Id"));
 
                     b.Property<int>("AccountId")
                         .HasColumnType("int");
@@ -283,9 +360,9 @@ namespace DiscordClone.Api.Migrations
 
                     b.HasIndex("AccountId");
 
-                    b.ToTable("Message<Chat, Guid>");
+                    b.ToTable((string)null);
 
-                    b.UseTptMappingStrategy();
+                    b.UseTpcMappingStrategy();
                 });
 
             modelBuilder.Entity("DiscordClone.Api.Entities.Message<DiscordClone.Api.Entities.GroupChat, System.Guid>", b =>
@@ -372,12 +449,11 @@ namespace DiscordClone.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 4);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("FileLocation")
                         .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("MessageId")
                         .HasColumnType("int");
@@ -398,9 +474,10 @@ namespace DiscordClone.Api.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasDefaultValueSql("NEXT VALUE FOR [MessageAttachmentSequence]");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 4);
+                    SqlServerPropertyBuilderExtensions.UseSequence(b.Property<int>("Id"));
 
                     b.Property<string>("FileLocation")
                         .IsRequired()
@@ -417,18 +494,19 @@ namespace DiscordClone.Api.Migrations
 
                     b.HasIndex("MessageId");
 
-                    b.ToTable("MessageAttachment<GroupChat, Guid>");
+                    b.ToTable((string)null);
 
-                    b.UseTptMappingStrategy();
+                    b.UseTpcMappingStrategy();
                 });
 
             modelBuilder.Entity("DiscordClone.Api.Entities.MessageAttachment<DiscordClone.Api.Entities.TextChannel, int>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasDefaultValueSql("NEXT VALUE FOR [MessageAttachmentSequence]");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 4);
+                    SqlServerPropertyBuilderExtensions.UseSequence(b.Property<int>("Id"));
 
                     b.Property<string>("FileLocation")
                         .IsRequired()
@@ -445,18 +523,19 @@ namespace DiscordClone.Api.Migrations
 
                     b.HasIndex("MessageId");
 
-                    b.ToTable("MessageAttachment<TextChannel, int>");
+                    b.ToTable((string)null);
 
-                    b.UseTptMappingStrategy();
+                    b.UseTpcMappingStrategy();
                 });
 
             modelBuilder.Entity("DiscordClone.Api.Entities.PreviousRegisteredEmailLookup", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasDefaultValueSql("NEXT VALUE FOR [PreviousRegisteredEmailLookupSequence]");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 4);
+                    SqlServerPropertyBuilderExtensions.UseSequence(b.Property<int>("Id"));
 
                     b.Property<int>("AccountId")
                         .HasColumnType("int");
@@ -473,19 +552,21 @@ namespace DiscordClone.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AccountId")
-                        .IsUnique();
+                    b.HasIndex("AccountId");
 
                     b.ToTable("PreviousRegisteredEmailLookups", (string)null);
+
+                    b.UseTpcMappingStrategy();
                 });
 
             modelBuilder.Entity("DiscordClone.Api.Entities.ProfileImage", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasDefaultValueSql("NEXT VALUE FOR [ProfileImageSequence]");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 4);
+                    SqlServerPropertyBuilderExtensions.UseSequence(b.Property<int>("Id"));
 
                     b.Property<byte[]>("Bytes")
                         .IsRequired()
@@ -503,15 +584,18 @@ namespace DiscordClone.Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ProfileImages", (string)null);
+
+                    b.UseTpcMappingStrategy();
                 });
 
             modelBuilder.Entity("DiscordClone.Api.Entities.Role", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasDefaultValueSql("NEXT VALUE FOR [RoleSequence]");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 4);
+                    SqlServerPropertyBuilderExtensions.UseSequence(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
@@ -541,15 +625,18 @@ namespace DiscordClone.Api.Migrations
                     b.HasIndex("ServerId");
 
                     b.ToTable("Roles", (string)null);
+
+                    b.UseTpcMappingStrategy();
                 });
 
             modelBuilder.Entity("DiscordClone.Api.Entities.RoleGeneralChannelPermission", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasDefaultValueSql("NEXT VALUE FOR [RoleGeneralChannelPermissionSequence]");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 4);
+                    SqlServerPropertyBuilderExtensions.UseSequence(b.Property<int>("Id"));
 
                     b.Property<int>("EntityId")
                         .HasColumnType("int");
@@ -561,6 +648,8 @@ namespace DiscordClone.Api.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EntityId");
 
                     b.HasIndex("PermissionId")
                         .IsUnique();
@@ -568,15 +657,18 @@ namespace DiscordClone.Api.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("RoleGeneralChannelPermissions", (string)null);
+
+                    b.UseTpcMappingStrategy();
                 });
 
             modelBuilder.Entity("DiscordClone.Api.Entities.RoleGeneralServerPermission", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasDefaultValueSql("NEXT VALUE FOR [RoleGeneralServerPermissionSequence]");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 4);
+                    SqlServerPropertyBuilderExtensions.UseSequence(b.Property<int>("Id"));
 
                     b.Property<int>("PermissionId")
                         .HasColumnType("int");
@@ -586,21 +678,23 @@ namespace DiscordClone.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PermissionId")
-                        .IsUnique();
+                    b.HasIndex("PermissionId");
 
                     b.HasIndex("RoleId");
 
                     b.ToTable("RoleGeneralServerPermissions", (string)null);
+
+                    b.UseTpcMappingStrategy();
                 });
 
             modelBuilder.Entity("DiscordClone.Api.Entities.RoleMembershipPermission", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasDefaultValueSql("NEXT VALUE FOR [RoleMembershipPermissionSequence]");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 4);
+                    SqlServerPropertyBuilderExtensions.UseSequence(b.Property<int>("Id"));
 
                     b.Property<int>("PermissionId")
                         .HasColumnType("int");
@@ -610,21 +704,23 @@ namespace DiscordClone.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PermissionId")
-                        .IsUnique();
+                    b.HasIndex("PermissionId");
 
                     b.HasIndex("RoleId");
 
                     b.ToTable("RoleMembershipPermissions", (string)null);
+
+                    b.UseTpcMappingStrategy();
                 });
 
             modelBuilder.Entity("DiscordClone.Api.Entities.RoleTextChannelPermission", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasDefaultValueSql("NEXT VALUE FOR [RoleTextChannelPermissionSequence]");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 4);
+                    SqlServerPropertyBuilderExtensions.UseSequence(b.Property<int>("Id"));
 
                     b.Property<int>("EntityId")
                         .HasColumnType("int");
@@ -639,21 +735,23 @@ namespace DiscordClone.Api.Migrations
 
                     b.HasIndex("EntityId");
 
-                    b.HasIndex("PermissionId")
-                        .IsUnique();
+                    b.HasIndex("PermissionId");
 
                     b.HasIndex("RoleId");
 
                     b.ToTable("RoleTextChannelPermissions", (string)null);
+
+                    b.UseTpcMappingStrategy();
                 });
 
             modelBuilder.Entity("DiscordClone.Api.Entities.RoleVoiceChannelPermission", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasDefaultValueSql("NEXT VALUE FOR [RoleVoiceChannelPermissionSequence]");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 4);
+                    SqlServerPropertyBuilderExtensions.UseSequence(b.Property<int>("Id"));
 
                     b.Property<int>("EntityId")
                         .HasColumnType("int");
@@ -668,12 +766,13 @@ namespace DiscordClone.Api.Migrations
 
                     b.HasIndex("EntityId");
 
-                    b.HasIndex("PermissionId")
-                        .IsUnique();
+                    b.HasIndex("PermissionId");
 
                     b.HasIndex("RoleId");
 
                     b.ToTable("RoleVoiceChannelPermissions", (string)null);
+
+                    b.UseTpcMappingStrategy();
                 });
 
             modelBuilder.Entity("DiscordClone.Api.Entities.SecurityCredentials", b =>
@@ -697,19 +796,21 @@ namespace DiscordClone.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("SecurityCredentials", (string)null);
+
+                    b.UseTpcMappingStrategy();
                 });
 
             modelBuilder.Entity("DiscordClone.Api.Entities.SecurityQuestion", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasDefaultValueSql("NEXT VALUE FOR [SecurityQuestionSequence]");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 4);
+                    SqlServerPropertyBuilderExtensions.UseSequence(b.Property<int>("Id"));
 
                     b.Property<string>("Answer")
                         .IsRequired()
@@ -729,15 +830,18 @@ namespace DiscordClone.Api.Migrations
                     b.HasIndex("LookupId");
 
                     b.ToTable("SecurityQuestions", (string)null);
+
+                    b.UseTpcMappingStrategy();
                 });
 
             modelBuilder.Entity("DiscordClone.Api.Entities.Server", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasDefaultValueSql("NEXT VALUE FOR [ServerSequence]");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 4);
+                    SqlServerPropertyBuilderExtensions.UseSequence(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
@@ -754,24 +858,26 @@ namespace DiscordClone.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("Servers", (string)null);
+
+                    b.UseTpcMappingStrategy();
                 });
 
             modelBuilder.Entity("DiscordClone.Api.Entities.ServerProfile", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasDefaultValueSql("NEXT VALUE FOR [ServerProfileSequence]");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 4);
+                    SqlServerPropertyBuilderExtensions.UseSequence(b.Property<int>("Id"));
 
                     b.Property<int>("AccountId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("AccountId1")
+                    b.Property<int?>("BaseChannelId")
                         .HasColumnType("int");
 
                     b.Property<string>("NickName")
@@ -785,60 +891,29 @@ namespace DiscordClone.Api.Migrations
                     b.Property<int>("ServerId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("VoiceChannelId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("AccountId");
 
-                    b.HasIndex("AccountId1");
+                    b.HasIndex("BaseChannelId");
 
-                    b.HasIndex("ProfileImageId")
-                        .IsUnique();
+                    b.HasIndex("ProfileImageId");
 
                     b.HasIndex("ServerId");
-
-                    b.HasIndex("VoiceChannelId");
 
                     b.ToTable("ServerProfiles", (string)null);
-                });
 
-            modelBuilder.Entity("DiscordClone.Api.Entities.TextChannel", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 4);
-
-                    b.Property<bool>("IsAgeRestricted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("ServerId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ServerId");
-
-                    b.ToTable("TextChannels", (string)null);
+                    b.UseTpcMappingStrategy();
                 });
 
             modelBuilder.Entity("DiscordClone.Api.Entities.TextChannelSetting", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasDefaultValueSql("NEXT VALUE FOR [TextChannelSettingSequence]");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 4);
+                    SqlServerPropertyBuilderExtensions.UseSequence(b.Property<int>("Id"));
 
                     b.Property<int>("ChannelId")
                         .HasColumnType("int");
@@ -863,9 +938,13 @@ namespace DiscordClone.Api.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ChannelId");
+
                     b.HasIndex("TextChannelId");
 
                     b.ToTable("TextChannelSettings", (string)null);
+
+                    b.UseTpcMappingStrategy();
                 });
 
             modelBuilder.Entity("DiscordClone.Api.Entities.User", b =>
@@ -904,47 +983,19 @@ namespace DiscordClone.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AccountId")
-                        .IsUnique();
-
                     b.ToTable("Users", (string)null);
-                });
 
-            modelBuilder.Entity("DiscordClone.Api.Entities.VoiceChannel", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 4);
-
-                    b.Property<bool>("IsAgeRestricted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("ServerId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ServerId");
-
-                    b.ToTable("VoiceChannels", (string)null);
+                    b.UseTpcMappingStrategy();
                 });
 
             modelBuilder.Entity("DiscordClone.Api.Entities.VoiceChannelSetting", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasDefaultValueSql("NEXT VALUE FOR [VoiceChannelSettingSequence]");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseSequence(b.Property<int>("Id"));
 
                     b.Property<int>("ChannelId")
                         .HasColumnType("int");
@@ -969,31 +1020,38 @@ namespace DiscordClone.Api.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ChannelId");
+
                     b.HasIndex("VoiceChannelId");
 
                     b.ToTable("VoiceChannelSettings", (string)null);
+
+                    b.UseTpcMappingStrategy();
                 });
 
-            modelBuilder.Entity("ServerProfileTextChannel", b =>
+            modelBuilder.Entity("DiscordClone.Api.Entities.TextChannel", b =>
                 {
-                    b.Property<int>("ServerProfileId")
-                        .HasColumnType("int");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseChannel");
 
-                    b.Property<int>("TextChannelId")
-                        .HasColumnType("int");
+                    b.HasIndex("ServerId");
 
-                    b.HasKey("ServerProfileId", "TextChannelId");
+                    b.ToTable("TextChannels", (string)null);
+                });
 
-                    b.HasIndex("TextChannelId");
+            modelBuilder.Entity("DiscordClone.Api.Entities.VoiceChannel", b =>
+                {
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseChannel");
 
-                    b.ToTable("ServerProfileTextChannel");
+                    b.HasIndex("ServerId");
+
+                    b.ToTable("VoiceChannels", (string)null);
                 });
 
             modelBuilder.Entity("DiscordClone.Api.Entities.ChannelPermission", b =>
                 {
                     b.HasBaseType("DiscordClone.Api.Entities.BasePermission");
 
-                    b.ToTable("ChannelPermissions", (string)null);
+                    b.ToTable("ChannelPermissions");
                 });
 
             modelBuilder.Entity("DiscordClone.Api.Entities.ServerPermission", b =>
@@ -1051,30 +1109,25 @@ namespace DiscordClone.Api.Migrations
                     b.ToTable("TextChannelMessageAttachments", (string)null);
                 });
 
-            modelBuilder.Entity("AccountRole", b =>
+            modelBuilder.Entity("DiscordClone.Api.Entities.Account", b =>
                 {
-                    b.HasOne("DiscordClone.Api.Entities.Account", null)
+                    b.HasOne("DiscordClone.Api.Entities.AccountImage", "Image")
                         .WithMany()
-                        .HasForeignKey("AccountsId")
+                        .HasForeignKey("AccountImageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("DiscordClone.Api.Entities.Role", null)
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
+                        .WithMany("Accounts")
+                        .HasForeignKey("RoleId");
 
-            modelBuilder.Entity("DiscordClone.Api.Entities.Account", b =>
-                {
-                    b.HasOne("DiscordClone.Api.Entities.AccountImage", "Image")
-                        .WithOne()
-                        .HasForeignKey("DiscordClone.Api.Entities.Account", "AccountImageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("DiscordClone.Api.Entities.User", "User")
+                        .WithOne("Account")
+                        .HasForeignKey("DiscordClone.Api.Entities.Account", "UserId");
 
                     b.Navigation("Image");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DiscordClone.Api.Entities.AccountChat", b =>
@@ -1211,8 +1264,8 @@ namespace DiscordClone.Api.Migrations
             modelBuilder.Entity("DiscordClone.Api.Entities.PreviousRegisteredEmailLookup", b =>
                 {
                     b.HasOne("DiscordClone.Api.Entities.Account", "Account")
-                        .WithOne()
-                        .HasForeignKey("DiscordClone.Api.Entities.PreviousRegisteredEmailLookup", "AccountId")
+                        .WithMany()
+                        .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1232,6 +1285,12 @@ namespace DiscordClone.Api.Migrations
 
             modelBuilder.Entity("DiscordClone.Api.Entities.RoleGeneralChannelPermission", b =>
                 {
+                    b.HasOne("DiscordClone.Api.Entities.BaseChannel", "Entity")
+                        .WithMany()
+                        .HasForeignKey("EntityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("DiscordClone.Api.Entities.BasePermission", "Permission")
                         .WithOne()
                         .HasForeignKey("DiscordClone.Api.Entities.RoleGeneralChannelPermission", "PermissionId")
@@ -1244,6 +1303,8 @@ namespace DiscordClone.Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Entity");
+
                     b.Navigation("Permission");
 
                     b.Navigation("Role");
@@ -1252,8 +1313,8 @@ namespace DiscordClone.Api.Migrations
             modelBuilder.Entity("DiscordClone.Api.Entities.RoleGeneralServerPermission", b =>
                 {
                     b.HasOne("DiscordClone.Api.Entities.BasePermission", "Permission")
-                        .WithOne()
-                        .HasForeignKey("DiscordClone.Api.Entities.RoleGeneralServerPermission", "PermissionId")
+                        .WithMany()
+                        .HasForeignKey("PermissionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1271,8 +1332,8 @@ namespace DiscordClone.Api.Migrations
             modelBuilder.Entity("DiscordClone.Api.Entities.RoleMembershipPermission", b =>
                 {
                     b.HasOne("DiscordClone.Api.Entities.BasePermission", "Permission")
-                        .WithOne()
-                        .HasForeignKey("DiscordClone.Api.Entities.RoleMembershipPermission", "PermissionId")
+                        .WithMany()
+                        .HasForeignKey("PermissionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1296,8 +1357,8 @@ namespace DiscordClone.Api.Migrations
                         .IsRequired();
 
                     b.HasOne("DiscordClone.Api.Entities.BasePermission", "Permission")
-                        .WithOne()
-                        .HasForeignKey("DiscordClone.Api.Entities.RoleTextChannelPermission", "PermissionId")
+                        .WithMany()
+                        .HasForeignKey("PermissionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1323,8 +1384,8 @@ namespace DiscordClone.Api.Migrations
                         .IsRequired();
 
                     b.HasOne("DiscordClone.Api.Entities.BasePermission", "Permission")
-                        .WithOne()
-                        .HasForeignKey("DiscordClone.Api.Entities.RoleVoiceChannelPermission", "PermissionId")
+                        .WithMany()
+                        .HasForeignKey("PermissionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1344,8 +1405,8 @@ namespace DiscordClone.Api.Migrations
             modelBuilder.Entity("DiscordClone.Api.Entities.SecurityCredentials", b =>
                 {
                     b.HasOne("DiscordClone.Api.Entities.User", "User")
-                        .WithOne()
-                        .HasForeignKey("DiscordClone.Api.Entities.SecurityCredentials", "UserId")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1366,8 +1427,8 @@ namespace DiscordClone.Api.Migrations
             modelBuilder.Entity("DiscordClone.Api.Entities.Server", b =>
                 {
                     b.HasOne("DiscordClone.Api.Entities.User", "User")
-                        .WithOne()
-                        .HasForeignKey("DiscordClone.Api.Entities.Server", "UserId")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1377,36 +1438,62 @@ namespace DiscordClone.Api.Migrations
             modelBuilder.Entity("DiscordClone.Api.Entities.ServerProfile", b =>
                 {
                     b.HasOne("DiscordClone.Api.Entities.Account", "Account")
-                        .WithMany()
+                        .WithMany("ServerProfiles")
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DiscordClone.Api.Entities.Account", null)
-                        .WithMany("ServerProfiles")
-                        .HasForeignKey("AccountId1");
+                    b.HasOne("DiscordClone.Api.Entities.BaseChannel", null)
+                        .WithMany("ServerProfile")
+                        .HasForeignKey("BaseChannelId");
 
                     b.HasOne("DiscordClone.Api.Entities.ProfileImage", "Image")
-                        .WithOne()
-                        .HasForeignKey("DiscordClone.Api.Entities.ServerProfile", "ProfileImageId")
+                        .WithMany()
+                        .HasForeignKey("ProfileImageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("DiscordClone.Api.Entities.Server", "Server")
                         .WithMany("ServerProfiles")
                         .HasForeignKey("ServerId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("DiscordClone.Api.Entities.VoiceChannel", null)
-                        .WithMany("ServerProfile")
-                        .HasForeignKey("VoiceChannelId");
 
                     b.Navigation("Account");
 
                     b.Navigation("Image");
 
                     b.Navigation("Server");
+                });
+
+            modelBuilder.Entity("DiscordClone.Api.Entities.TextChannelSetting", b =>
+                {
+                    b.HasOne("DiscordClone.Api.Entities.BaseChannel", "Channel")
+                        .WithMany()
+                        .HasForeignKey("ChannelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DiscordClone.Api.Entities.TextChannel", null)
+                        .WithMany("TextChannelSettings")
+                        .HasForeignKey("TextChannelId");
+
+                    b.Navigation("Channel");
+                });
+
+            modelBuilder.Entity("DiscordClone.Api.Entities.VoiceChannelSetting", b =>
+                {
+                    b.HasOne("DiscordClone.Api.Entities.BaseChannel", "Channel")
+                        .WithMany()
+                        .HasForeignKey("ChannelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DiscordClone.Api.Entities.VoiceChannel", null)
+                        .WithMany("VoiceChannelSettings")
+                        .HasForeignKey("VoiceChannelId");
+
+                    b.Navigation("Channel");
                 });
 
             modelBuilder.Entity("DiscordClone.Api.Entities.TextChannel", b =>
@@ -1420,24 +1507,6 @@ namespace DiscordClone.Api.Migrations
                     b.Navigation("Server");
                 });
 
-            modelBuilder.Entity("DiscordClone.Api.Entities.TextChannelSetting", b =>
-                {
-                    b.HasOne("DiscordClone.Api.Entities.TextChannel", null)
-                        .WithMany("TextChannelSettings")
-                        .HasForeignKey("TextChannelId");
-                });
-
-            modelBuilder.Entity("DiscordClone.Api.Entities.User", b =>
-                {
-                    b.HasOne("DiscordClone.Api.Entities.Account", "Account")
-                        .WithOne("User")
-                        .HasForeignKey("DiscordClone.Api.Entities.User", "AccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Account");
-                });
-
             modelBuilder.Entity("DiscordClone.Api.Entities.VoiceChannel", b =>
                 {
                     b.HasOne("DiscordClone.Api.Entities.Server", "Server")
@@ -1449,57 +1518,11 @@ namespace DiscordClone.Api.Migrations
                     b.Navigation("Server");
                 });
 
-            modelBuilder.Entity("DiscordClone.Api.Entities.VoiceChannelSetting", b =>
-                {
-                    b.HasOne("DiscordClone.Api.Entities.VoiceChannel", null)
-                        .WithMany("VoiceChannelSettings")
-                        .HasForeignKey("VoiceChannelId");
-                });
-
-            modelBuilder.Entity("ServerProfileTextChannel", b =>
-                {
-                    b.HasOne("DiscordClone.Api.Entities.ServerProfile", null)
-                        .WithMany()
-                        .HasForeignKey("ServerProfileId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DiscordClone.Api.Entities.TextChannel", null)
-                        .WithMany()
-                        .HasForeignKey("TextChannelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("DiscordClone.Api.Entities.ChannelPermission", b =>
-                {
-                    b.HasOne("DiscordClone.Api.Entities.BasePermission", null)
-                        .WithOne()
-                        .HasForeignKey("DiscordClone.Api.Entities.ChannelPermission", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("DiscordClone.Api.Entities.ServerPermission", b =>
-                {
-                    b.HasOne("DiscordClone.Api.Entities.BasePermission", null)
-                        .WithOne()
-                        .HasForeignKey("DiscordClone.Api.Entities.ServerPermission", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("DiscordClone.Api.Entities.ChatMessage", b =>
                 {
                     b.HasOne("DiscordClone.Api.Entities.Chat", "Chat")
                         .WithMany("Messages")
                         .HasForeignKey("ChatId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DiscordClone.Api.Entities.Message<DiscordClone.Api.Entities.Chat, System.Guid>", null)
-                        .WithOne()
-                        .HasForeignKey("DiscordClone.Api.Entities.ChatMessage", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1537,24 +1560,6 @@ namespace DiscordClone.Api.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("DiscordClone.Api.Entities.GroupChatMessageAttachment", b =>
-                {
-                    b.HasOne("DiscordClone.Api.Entities.MessageAttachment<DiscordClone.Api.Entities.GroupChat, System.Guid>", null)
-                        .WithOne()
-                        .HasForeignKey("DiscordClone.Api.Entities.GroupChatMessageAttachment", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("DiscordClone.Api.Entities.TextChannelMessageAttachment", b =>
-                {
-                    b.HasOne("DiscordClone.Api.Entities.MessageAttachment<DiscordClone.Api.Entities.TextChannel, int>", null)
-                        .WithOne()
-                        .HasForeignKey("DiscordClone.Api.Entities.TextChannelMessageAttachment", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("DiscordClone.Api.Entities.Account", b =>
                 {
                     b.Navigation("Chats");
@@ -1562,9 +1567,11 @@ namespace DiscordClone.Api.Migrations
                     b.Navigation("Friends");
 
                     b.Navigation("ServerProfiles");
+                });
 
-                    b.Navigation("User")
-                        .IsRequired();
+            modelBuilder.Entity("DiscordClone.Api.Entities.BaseChannel", b =>
+                {
+                    b.Navigation("ServerProfile");
                 });
 
             modelBuilder.Entity("DiscordClone.Api.Entities.Chat", b =>
@@ -1606,6 +1613,8 @@ namespace DiscordClone.Api.Migrations
 
             modelBuilder.Entity("DiscordClone.Api.Entities.Role", b =>
                 {
+                    b.Navigation("Accounts");
+
                     b.Navigation("RoleGeneralChannelPermission");
 
                     b.Navigation("RoleGeneralServerPermission");
@@ -1628,6 +1637,12 @@ namespace DiscordClone.Api.Migrations
                     b.Navigation("VoiceChannels");
                 });
 
+            modelBuilder.Entity("DiscordClone.Api.Entities.User", b =>
+                {
+                    b.Navigation("Account")
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("DiscordClone.Api.Entities.TextChannel", b =>
                 {
                     b.Navigation("Messages");
@@ -1637,8 +1652,6 @@ namespace DiscordClone.Api.Migrations
 
             modelBuilder.Entity("DiscordClone.Api.Entities.VoiceChannel", b =>
                 {
-                    b.Navigation("ServerProfile");
-
                     b.Navigation("VoiceChannelSettings");
                 });
 #pragma warning restore 612, 618

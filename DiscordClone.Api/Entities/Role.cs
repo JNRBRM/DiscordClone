@@ -7,7 +7,7 @@
         public DateTime CreatedDate { get; set; }
         public bool IsServerAdmin { get; set; }
         public int ServerId { get; set; }
-        public List<Account> Accounts { get; set; }
+        public List<ServerProfile> Profiles { get; set; }
         public List<RoleGeneralServerPermission> RoleGeneralServerPermission { get; set; }
         public List<RoleGeneralChannelPermission> RoleGeneralChannelPermission { get; set; }
         public List<RoleMembershipPermission> RoleMembershipPermission { get; set; }

@@ -1,6 +1,6 @@
 ﻿namespace DiscordClone.Api.Entities
 {
-    public class TextChannelMessageAttachment:MessageAttachment<TextChannel, int>
+    public class TextChannelMessageAttachment:BaseMessageAttachment<TextChannel, int>
     {
     }
 }
