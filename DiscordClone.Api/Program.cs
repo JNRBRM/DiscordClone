@@ -1,4 +1,7 @@
 using DiscordClone.Api.DBContext;
+using DiscordClone.Api.Interface;
+using DiscordClone.Api.Repositorys;
+using DiscordClone.Api.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 
@@ -15,7 +18,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 #region scoopeds
-
+builder.Services.AddScoped(typeof(IGenericService<>), typeof(GenericService<>));
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 #endregion
 
 #region cors

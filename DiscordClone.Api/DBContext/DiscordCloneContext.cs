@@ -153,7 +153,7 @@ namespace DiscordClone.Api.DBContext
                 model.HasMany(x => x.AccountChats).WithOne(x => x.Account).HasForeignKey(x => x.AccountId).IsRequired(true);
                 model.HasMany(x => x.AccountGroupChats).WithOne(x => x.Account).HasForeignKey(x => x.AccountId).IsRequired(true);
                 model.HasMany(x => x.ServerProfiles).WithOne(x => x.Account).HasForeignKey(x => x.AccountId).IsRequired(true);
-                model.HasOne(x => x.Image).WithOne(x=>x.Account).HasForeignKey<AccountImage>(x=>x.AccountId);
+                //model.HasOne(x => x.Image).WithOne(x=>x.Account).HasForeignKey<AccountImage>(x=>x.AccountId);
             });
             modelBuilder.Entity<Account>().UseTpcMappingStrategy().ToTable("Accounts");
             modelBuilder.Entity<AccountImage>().UseTpcMappingStrategy().ToTable("AccountImages");
