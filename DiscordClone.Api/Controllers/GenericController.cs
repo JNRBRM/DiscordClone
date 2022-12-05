@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DiscordClone.Api.Controllers
 {
-    
+    //Generic classe are defined using a type parameter in an angle brackets after the class name
     [ApiController]
     public class GenericController<T> : ControllerBase where T : class
     {
