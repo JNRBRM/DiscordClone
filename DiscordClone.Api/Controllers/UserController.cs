@@ -13,5 +13,15 @@ namespace DiscordClone.Api.Controllers
         public UserController(IGenericService<User> GenericService) : base(GenericService)
         {
         }
+
+        [HttpPost("Login")]
+        public async Task<ActionResult> Login([FromBody] User User)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("entity error");
+            }
+            return Ok(User);
+        }
     }
 }
