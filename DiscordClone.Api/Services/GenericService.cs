@@ -15,8 +15,7 @@ namespace DiscordClone.Api.Services
 
         public async virtual Task<bool> Create(T Item)
         {
-            var data = await _GenericRepository.Create(Item);
-            if (data)
+            if (await _GenericRepository.Create(Item))
             {
                 return true;
             }

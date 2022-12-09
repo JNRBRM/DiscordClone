@@ -8,6 +8,6 @@
         public bool EmailConfirmed { get; set; }
         public bool PhoneNumberConfirmed { get; set; }
         public DateTime PasswordSetDate { get; set; }
-        public Account Account { get; set; }
+        public Account? Account { get; set; }
     }
 }

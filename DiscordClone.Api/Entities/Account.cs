@@ -20,9 +20,4 @@ namespace DiscordClone.Api.Entities
         public User User { get; set; }
 
     }
-    public enum chattype
-    {
-        Chat,
-        GroupChat,
-    }
 }

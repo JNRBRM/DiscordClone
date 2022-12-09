@@ -28,8 +28,8 @@ namespace DiscordClone.Api.Repositorys
         }
         public async Task<bool> Create(T Item)
         {
-            _Context.Add(Item);
-            await _Context.SaveChangesAsync();
+            //_Context.Add(Item);
+            //await _Context.SaveChangesAsync();
             return true;
         }
 
