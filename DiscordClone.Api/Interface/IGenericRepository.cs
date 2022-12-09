@@ -8,7 +8,6 @@ namespace DiscordClone.Api.Interface
 
         Task<T> GetById(Type id);
 
-       // Task<T> Update(Type Id, T Item);
         Task<T> Update(T Item);
 
         Task<bool> Create(T Item);
