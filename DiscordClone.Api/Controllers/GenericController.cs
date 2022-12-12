@@ -7,11 +7,11 @@ namespace DiscordClone.Api.Controllers
 {
     
     [ApiController]
-    public class GenericController<T> : ControllerBase where T : class
+    public class GenericController<T,IdType> : ControllerBase where T : class
     {
-        private IGenericService<T> _GenericService;
+        private IGenericService<T, IdType> _GenericService;
 
-        public GenericController(IGenericService<T> GenericService)
+        public GenericController(IGenericService<T, IdType> GenericService)
         {
             _GenericService = GenericService;
         }
@@ -37,12 +37,9 @@ namespace DiscordClone.Api.Controllers
         }
 
         [HttpGet("GetById/{Id}")]
-        public async Task<ActionResult> GetById(Type Id)
+        public async Task<ActionResult> GetById(IdType Id)
         {
-            if(Id != typeof(int) && Id != typeof(Guid))
-            {
-                return BadRequest("type error");
-            }
+            
 
             var Item = await _GenericService.GetById(Id);
 
@@ -79,12 +76,8 @@ namespace DiscordClone.Api.Controllers
         }
 
         [HttpDelete("DeleteById/{Id}")]
-        public async Task<ActionResult> Delete(Type Id)
+        public async Task<ActionResult> Delete(IdType Id)
         {
-            if (Id != typeof(int) && Id != typeof(Guid))
-            {
-                return BadRequest("type error");
-            }
             return Ok(await _GenericService.Delete(Id));
         }
     }

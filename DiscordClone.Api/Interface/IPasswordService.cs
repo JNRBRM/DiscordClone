@@ -2,7 +2,7 @@
 
 namespace DiscordClone.Api.Interface
 {
-    public interface IPasswordService : IGenericService<SecurityCredentials>
+    public interface IPasswordService : IGenericService<SecurityCredentials,Guid>
     {
     }
 }

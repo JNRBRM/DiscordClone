@@ -10,12 +10,12 @@ using System.Text.Json.Nodes;
 
 namespace DiscordClone.Api.Services
 {
-    public class UserService : GenericService<User>, IUserService
+    public class UserService : GenericService<User,Guid>, IUserService
     {
         private readonly IUserRepository _UserRepository;
         private readonly Passwordhandler _PasswordHandler;
         private readonly JWTSettings _JWTSettings;
-        public UserService(IGenericRepository<User> GenericRepository, IUserRepository UserRepository) : base(GenericRepository)
+        public UserService(IUserRepository UserRepository) : base(UserRepository)
         {
             _UserRepository = UserRepository;
         }
@@ -61,6 +61,9 @@ namespace DiscordClone.Api.Services
             var UserHolde = await _UserRepository.FindByConditionAsync(obj => obj.Email == Item.Email);
             return await _PasswordHandler.CreatePassword(PasswordHolder,UserHolde.Id);
         }
-
+    //    public async override Task<bool> Create(JsonObject Item)
+    //    {
+            
+    //    }
     }
 }

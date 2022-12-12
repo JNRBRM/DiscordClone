@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 
 namespace DiscordClone.Api.Services
 {
-    public class GenericService<T> : IGenericService<T> where T : BaseEntity
+    public class GenericService<T, IdType> : IGenericService<T,IdType> where T : BaseEntity
     {
         private IGenericRepository<T> _GenericRepository;
 
@@ -22,9 +22,9 @@ namespace DiscordClone.Api.Services
             return false;
         }
 
-        public async virtual Task<bool> Delete(Type id)
+        public async virtual Task<bool> Delete(IdType id)
         {
-            return await _GenericRepository.Delete(id);
+            return await _GenericRepository.Delete(obj => obj.Id.ToString() == id.ToString());
         }
 
         public async virtual Task<T> FindByConditionAsync(Expression<Func<T, bool>> predicate)
@@ -42,9 +42,9 @@ namespace DiscordClone.Api.Services
             return await _GenericRepository.GetAll();
         }
 
-        public async Task<T> GetById(Type id)
+        public async Task<T> GetById(IdType id)
         {
-            return await _GenericRepository.GetById(id);
+            return await _GenericRepository.GetById(obj => obj.Id.ToString() == id.ToString());
         }
 
         public async virtual Task<T> Update(T Item)
