@@ -54,10 +54,10 @@ namespace DiscordClone.Api.Controllers
         [HttpPost("Create")]
         public async virtual Task<ActionResult> Create([FromBody] T Value)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest("Invalid object");
-            }
+            //if (!ModelState.IsValid)
+            //{
+            //    return BadRequest("Invalid object");
+            //}
 
             //return CreatedAtAction(nameof(Create), await _GenericService.Create(Value));
             return Ok(await _GenericService.Create(Value));

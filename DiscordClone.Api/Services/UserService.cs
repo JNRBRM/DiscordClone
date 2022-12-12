@@ -61,9 +61,5 @@ namespace DiscordClone.Api.Services
             var UserHolde = await _UserRepository.FindByConditionAsync(obj => obj.Email == Item.Email);
             return await _PasswordHandler.CreatePassword(PasswordHolder,UserHolde.Id);
         }
-    //    public async override Task<bool> Create(JsonObject Item)
-    //    {
-            
-    //    }
     }
 }

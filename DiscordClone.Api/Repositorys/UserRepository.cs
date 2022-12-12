@@ -7,7 +7,7 @@ namespace DiscordClone.Api.Repositorys
     public class UserRepository : GenericRepository<User>, IUserRepository
     {
         private DiscordCloneContext _Context;
-        public UserRepository(DiscordCloneContext Context):base(Context)
+        public UserRepository(DiscordCloneContext Context) : base(Context)
         {
             _Context= Context;
         }

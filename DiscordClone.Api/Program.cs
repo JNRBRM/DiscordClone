@@ -21,6 +21,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 #region scoopeds
+//builder.Services.AddScoped(typeof(IGenericService<,>), typeof(IGenericService<,>));
+//builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(IGenericRepository<>));
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository,UserRepository>();
 #endregion

@@ -8,11 +8,10 @@ namespace DiscordClone.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : GenericController<User,Guid>
+    public class UserController : GenericController<User, Guid>
     {
         private readonly IUserService _UserService;
-        private readonly JsonObjectHandler _JsonObjectHandler;
-        public UserController(IGenericService<User,Guid> GenericService, IUserService UserService) : base(GenericService)
+        public UserController(IUserService UserService) : base(UserService)
         {
             _UserService = UserService;
         }
@@ -41,29 +40,18 @@ namespace DiscordClone.Api.Controllers
             return Ok(await _UserService.Create(Value));
         }
 
-        [HttpPost("UserCreate")]
-        public async Task<ActionResult> Create([FromBody] JsonObject obj)
+        [HttpPost("Register")]
+        public async Task<ActionResult> Create(User user, SecurityCredentials creds)
         {
-            if (obj["Email"] is null || obj["Displayname"] is null)
-            {
-                return BadRequest();
-            }
+          
             //_JsonObjectHandler.CheckJsonObject(obj);
             return Ok(/*await _UserService.Create(obj)*/);
-        }
-    }
-
-    public class JsonObjectHandler
-    {
-        public bool CheckJsonObject(JsonObject obj)
-        {
-            var h = obj["Email"];
-            return true;
         }
     }
 }
 /* test data
 {
+"id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
 "Displayname" : "ds5",
 "image":{
 "bytes": "",
