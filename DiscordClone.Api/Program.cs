@@ -1,5 +1,5 @@
+using DiscordClone.Api.DataModels;
 using DiscordClone.Api.DBContext;
-using DiscordClone.Api.Entities;
 using DiscordClone.Api.Interface;
 using DiscordClone.Api.Repositorys;
 using DiscordClone.Api.Services;
@@ -21,8 +21,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 #region scoopeds
-builder.Services.AddScoped(typeof(IGenericService<>), typeof(GenericService<>));
-builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+//builder.Services.AddScoped(typeof(IGenericService<,>), typeof(IGenericService<,>));
+//builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(IGenericRepository<>));
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository,UserRepository>();
 #endregion

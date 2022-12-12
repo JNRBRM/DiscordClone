@@ -1,4 +1,5 @@
-﻿using DiscordClone.Api.Entities;
+﻿using DiscordClone.Api.DataModels;
+using DiscordClone.Api.Entities;
 using DiscordClone.Api.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -8,10 +9,10 @@ namespace DiscordClone.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : GenericController<User>
+    public class UserController : GenericController<User, Guid>
     {
         private readonly IUserService _UserService;
-        public UserController(IGenericService<User> GenericService, IUserService UserService) : base(GenericService)
+        public UserController(IUserService UserService) : base(UserService)
         {
             _UserService = UserService;
         }
@@ -39,11 +40,27 @@ namespace DiscordClone.Api.Controllers
         {
             return Ok(await _UserService.Create(Value));
         }
+
+        [HttpPost("Register")]
+        public async Task<ActionResult> Create(User user, SecurityCredentials creds)
+        {
+          
+            //_JsonObjectHandler.CheckJsonObject(obj);
+            return Ok(/*await _UserService.Create(obj)*/);
+        }
     }
 }
 /* test data
 {
+"id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+"Displayname" : "ds5",
+"image":{
+"bytes": "",
+"fileExtension": "",
+"size": 0
+},
 "Email":"ds5@gmail.com",
-"Password":"Pa$$w0rd"
+"Password":"Pa$$w0rd",
+"PhoneNumber":""
 }
  */

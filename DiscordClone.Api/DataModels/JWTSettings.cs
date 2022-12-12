@@ -1,4 +1,4 @@
-﻿namespace DiscordClone.Api.Entities
+﻿namespace DiscordClone.Api.DataModels
 {
     public class JWTSettings
     {

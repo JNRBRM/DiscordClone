@@ -51,6 +51,14 @@ namespace DiscordClone.Api.DBContext
             base.OnModelCreating(modelBuilder);
 
             #region BaseSetup
+            modelBuilder.Entity<BaseEntity<int>>(model =>
+            {
+                model.HasKey(x => x.Id);
+            });
+            modelBuilder.Entity<BaseEntity<Guid>>(model =>
+            {
+                model.HasKey(x=>x.Id);
+            });
             modelBuilder.Entity<BaseChannel>(model =>
             {
                 model.HasKey(x => x.Id);
@@ -146,22 +154,20 @@ namespace DiscordClone.Api.DBContext
             #region Add Entity
             modelBuilder.Entity<Account>(model =>
             {
-                model.HasKey(x => x.Id);
                 model.Property(x => x.DisplayName).HasMaxLength(32).IsRequired(true);
                 model.Property(x => x.CreatedDate).HasDefaultValueSql("getdate()").IsRequired(true);
                 model.Property(x => x.LastLogonDate).IsRequired(false);
                 model.HasMany(x => x.AccountChats).WithOne(x => x.Account).HasForeignKey(x => x.AccountId).IsRequired(true);
                 model.HasMany(x => x.AccountGroupChats).WithOne(x => x.Account).HasForeignKey(x => x.AccountId).IsRequired(true);
                 model.HasMany(x => x.ServerProfiles).WithOne(x => x.Account).HasForeignKey(x => x.AccountId).IsRequired(true);
-                //model.HasOne(x => x.Image).WithOne(x=>x.Account).HasForeignKey<AccountImage>(x=>x.AccountId);
+                model.HasOne(x => x.Image).WithOne().HasForeignKey<Account>(x=>x.ImageId);
             });
             modelBuilder.Entity<Account>().UseTpcMappingStrategy().ToTable("Accounts");
+            modelBuilder.Entity<AccountGroupChat>(model =>
+            {
+            });
             modelBuilder.Entity<AccountImage>().UseTpcMappingStrategy().ToTable("AccountImages");
             modelBuilder.Entity<ChannelPermission>().UseTpcMappingStrategy().ToTable("ChannelPermissions");
-            modelBuilder.Entity<Chat>(model =>
-            {
-               
-            });
             modelBuilder.Entity<Chat>().UseTpcMappingStrategy().ToTable("Chats");
             modelBuilder.Entity<Friend>()
                 .HasOne(x => x.Account1)
@@ -182,7 +188,8 @@ namespace DiscordClone.Api.DBContext
 
             modelBuilder.Entity<GroupChat>(model =>
             {
-              
+                model.Property(x=>x.Name).HasMaxLength(100);
+                model.HasOne(x => x.Owner).WithOne(x => x.GroupChat).HasForeignKey<GroupChat>(x => x.OwnerId);
             });
             modelBuilder.Entity<GroupChat>().UseTpcMappingStrategy().ToTable("GroupChats");
             

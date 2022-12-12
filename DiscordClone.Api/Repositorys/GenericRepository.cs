@@ -76,5 +76,15 @@ namespace DiscordClone.Api.Repositorys
         {
             return await GetEntity().Where(predicate).ToListAsync();
         }
+
+        public Task<T> GetById(Expression<Func<T, bool>> predicate)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> Delete(Expression<Func<T, bool>> predicate)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

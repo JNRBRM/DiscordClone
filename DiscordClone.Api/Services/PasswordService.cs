@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 
 namespace DiscordClone.Api.Services
 {
-    public class PasswordService:GenericService<SecurityCredentials>
+    public class PasswordService:GenericService<SecurityCredentials, Guid>
     {
         public PasswordService(IGenericRepository<SecurityCredentials> GenericRepository):base(GenericRepository) 
         {
