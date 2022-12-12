@@ -1,5 +1,5 @@
+using DiscordClone.Api.DataModels;
 using DiscordClone.Api.DBContext;
-using DiscordClone.Api.Entities;
 using DiscordClone.Api.Interface;
 using DiscordClone.Api.Repositorys;
 using DiscordClone.Api.Services;
