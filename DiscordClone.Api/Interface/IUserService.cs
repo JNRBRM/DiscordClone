@@ -1,4 +1,5 @@
-﻿using DiscordClone.Api.Entities;
+﻿using DiscordClone.Api.DataModels;
+using DiscordClone.Api.Entities;
 using System.Text.Json.Nodes;
 
 namespace DiscordClone.Api.Interface

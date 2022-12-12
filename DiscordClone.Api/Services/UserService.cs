@@ -1,4 +1,5 @@
-﻿using DiscordClone.Api.Entities;
+﻿using DiscordClone.Api.DataModels;
+using DiscordClone.Api.Entities;
 using DiscordClone.Api.handlers;
 using DiscordClone.Api.Interface;
 using Microsoft.IdentityModel.Tokens;

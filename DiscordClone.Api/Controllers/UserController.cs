@@ -1,4 +1,5 @@
-﻿using DiscordClone.Api.Entities;
+﻿using DiscordClone.Api.DataModels;
+using DiscordClone.Api.Entities;
 using DiscordClone.Api.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
