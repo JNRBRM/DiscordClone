@@ -3,6 +3,7 @@ using DiscordClone.Api.Entities;
 using DiscordClone.Api.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using System.Text.Json.Nodes;
 
 namespace DiscordClone.Api.Controllers
@@ -36,29 +37,23 @@ namespace DiscordClone.Api.Controllers
             return Ok(Token);
         }
 
-        public override async Task<ActionResult> Create([FromBody] User Value)
-        {
-            return Ok(await _UserService.Create(Value));
-        }
 
         [HttpPost("Register")]
-        public async Task<ActionResult> Create(User user, SecurityCredentials creds)
+        public async Task<ActionResult> Register([FromBody] RegisterModel Register)
         {
-          
-            //_JsonObjectHandler.CheckJsonObject(obj);
-            return Ok(/*await _UserService.Create(obj)*/);
+            return Ok(await _UserService.Register(Register));
+        }
+
+        [HttpGet("activate/{token}")]
+        public async Task<ActionResult> Activate(Guid token)
+        {
+            return Ok(await _UserService.Activate(token));
         }
     }
 }
 /* test data
 {
-"id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
 "Displayname" : "ds5",
-"image":{
-"bytes": "",
-"fileExtension": "",
-"size": 0
-},
 "Email":"ds5@gmail.com",
 "Password":"Pa$$w0rd",
 "PhoneNumber":""

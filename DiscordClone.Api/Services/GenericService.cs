@@ -27,9 +27,9 @@ namespace DiscordClone.Api.Services
             return await _GenericRepository.Delete(obj => obj.Id.ToString() == id.ToString());
         }
 
-        public async virtual Task<T> FindByConditionAsync(Expression<Func<T, bool>> predicate)
+        public async virtual Task<T> FindByCondition(Expression<Func<T, bool>> predicate)
         {
-            return await _GenericRepository.FindByConditionAsync(predicate);
+            return await _GenericRepository.FindByCondition(predicate);
         }
 
         public Task<List<T>> FindByConditionToList(Expression<Func<T, bool>> predicate)

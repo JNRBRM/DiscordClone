@@ -19,10 +19,8 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+builder.Services.AddMemoryCache();
 #region scoopeds
-//builder.Services.AddScoped(typeof(IGenericService<,>), typeof(IGenericService<,>));
-//builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(IGenericRepository<>));
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository,UserRepository>();
 #endregion
@@ -42,7 +40,6 @@ builder.Services.AddCors(options =>
 #region jwt
 var jwtSection = builder.Configuration.GetSection("JWTSettings");
 builder.Services.Configure<JWTSettings>(jwtSection);
-
 var appSettings = jwtSection.Get<JWTSettings>();
 var key = Encoding.ASCII.GetBytes(appSettings.Secret);
 

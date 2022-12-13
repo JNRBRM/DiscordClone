@@ -10,7 +10,7 @@ namespace DiscordClone.Api.handlers
         private readonly IPasswordService _PasswordService;
         public async Task<bool> checkPassword(string Password, Guid UserId)
         {
-            var UserPassword = await _PasswordService.FindByConditionAsync(obj => obj.UserId == UserId);
+            var UserPassword = await _PasswordService.FindByCondition(obj => obj.UserId == UserId);
 
             byte[] password = Encoding.ASCII.GetBytes(Password);
             HashAlgorithm algorithm = new SHA256Managed();

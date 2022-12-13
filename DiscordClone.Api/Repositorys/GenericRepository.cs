@@ -67,7 +67,7 @@ namespace DiscordClone.Api.Repositorys
             await _Context.SaveChangesAsync();
             return Item;
         }
-        public async virtual Task<T> FindByConditionAsync(Expression<Func<T, bool>> predicate)
+        public async virtual Task<T> FindByCondition(Expression<Func<T, bool>> predicate)
         {
             return await GetEntity().FirstOrDefaultAsync(predicate);
         }

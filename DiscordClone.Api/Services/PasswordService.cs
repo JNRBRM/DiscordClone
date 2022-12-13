@@ -11,9 +11,9 @@ namespace DiscordClone.Api.Services
 
         }
 
-        public override Task<SecurityCredentials> FindByConditionAsync(Expression<Func<SecurityCredentials, bool>> predicate)
+        public override Task<SecurityCredentials> FindByCondition(Expression<Func<SecurityCredentials, bool>> predicate)
         {
-            return base.FindByConditionAsync(predicate);
+            return base.FindByCondition(predicate);
         }
     }
 }

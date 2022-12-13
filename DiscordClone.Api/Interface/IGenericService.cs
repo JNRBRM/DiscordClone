@@ -16,7 +16,7 @@ namespace DiscordClone.Api.Interface
 
         Task<bool> Delete(IdType id);
 
-        Task<T> FindByConditionAsync(Expression<Func<T, bool>> predicate);
+        Task<T> FindByCondition(Expression<Func<T, bool>> predicate);
         Task<List<T>> FindByConditionToList(Expression<Func<T, bool>> predicate);
     }
 }
