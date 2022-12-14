@@ -1,6 +1,6 @@
 ﻿namespace DiscordClone.Api.Entities
 {
-    public class ProfileImage : BaseImage
+    public class ServerProfileImage : BaseImage
     {
     }
 }
