@@ -1,6 +1,9 @@
 ﻿
 using FluentEmail.Core;
 using FluentEmail.Smtp;
+using SendGrid;
+using SendGrid.Helpers.Mail;
+using System.Net;
 using System.Net.Mail;
 using System.Text;
 
@@ -8,29 +11,35 @@ namespace DiscordClone.Api.handlers
 {
     public class EmailHandler
     {
-        public async Task<bool> SendEmail(string body)
+        public async Task<bool> SendEmail(string recipientMail, string MailBody)
         {
-            var sender = new SmtpSender(() => new SmtpClient("localhost")
+            // Set up the SMTP server configuration
+            using (var smtpServer = new SmtpClient
             {
-                EnableSsl = false,
-                //DeliveryMethod = SmtpDeliveryMethod.Network,
-                Port = 25,
-                DeliveryMethod = SmtpDeliveryMethod.SpecifiedPickupDirectory,
-                PickupDirectoryLocation = @"C:\Demos"
-            });
-
-
-            Email.DefaultSender = sender;
-            //Email.DefaultRenderer = new RazorRenderer();
-
-            var email = await Email
-                .From("tim@timco.com")
-                .To("test@test.com", "Sue")
-                .Subject("Thanks!")
-                .UsingTemplate(body.ToString(), new { FirstName = "Tim", ProductName = "Bacon-Wrapped Bacon" })
-                //.Body("Thanks for buying our product.")
-                .SendAsync();
-            return true;
+                Host = "smtp.outlook.com",
+                Port = 587,
+                EnableSsl = true,
+                Credentials = new NetworkCredential("rasm232m@elev.tec.dk", "tnv73gmm")
+            })
+            {
+                var msg = new MailMessage
+                {
+                    From = new MailAddress("rasm232m@elev.tec.dk"),
+                    Subject = "Hello World",
+                    Body = MailBody
+                };
+                msg.To.Add(new MailAddress(recipientMail));
+                try
+                {
+                    smtpServer.Send(msg);
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    return false;
+                }
+                
+            }
         }
     }
 }

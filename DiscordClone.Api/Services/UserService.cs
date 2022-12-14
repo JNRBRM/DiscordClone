@@ -89,7 +89,7 @@ namespace DiscordClone.Api.Services
                 currentRegisters.Add(new CachedItem<RegisterModel, Guid> { Id = uniqueId, Item = Register });
                _Cache.Set(_RegisterCacheKey, currentRegisters, cacheEntryOptions);
             }
-            var response=await handler.SendEmail($"<a href=\"https://localhost:44329/api/User/activate/{uniqueId}\">hej</a>");
+            var response=await handler.SendEmail(Register.Email,$"<a href=\"https://localhost:44329/api/User/activate/{uniqueId}\">hej</a>");
             return true;
         }
 
