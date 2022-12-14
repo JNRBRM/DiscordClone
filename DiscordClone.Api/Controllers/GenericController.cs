@@ -27,20 +27,20 @@ namespace DiscordClone.Api.Controllers
         public async Task<ActionResult<List<T>>> GetAll()
         {
             var Items = await _GenericService.GetAll();
-
             if (Items is null)
             {
                 return NotFound();
             }
-
+            if (Items.Count == 0)
+            {
+                return NoContent();
+            }
             return Ok(Items);
         }
 
         [HttpGet("GetById/{Id}")]
         public async Task<ActionResult> GetById(IdType Id)
         {
-            
-
             var Item = await _GenericService.GetById(Id);
 
             if (Item is null)
@@ -60,7 +60,8 @@ namespace DiscordClone.Api.Controllers
             }
 
             //return CreatedAtAction(nameof(Create), await _GenericService.Create(Value));
-            return Ok(await _GenericService.Create(Value));
+            var res = await _GenericService.Create(Value);
+            return Ok(res);
         }
 
         [HttpPut("Update")]

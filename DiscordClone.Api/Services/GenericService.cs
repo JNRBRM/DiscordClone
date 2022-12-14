@@ -13,13 +13,10 @@ namespace DiscordClone.Api.Services
             _GenericRepository = GenericRepository;
         }
 
-        public async virtual Task<bool> Create(T Item)
+        public async virtual Task<T> Create(T Item)
         {
-            if (await _GenericRepository.Create(Item))
-            {
-                return true;
-            }
-            return false;
+           return await _GenericRepository.Create(Item);
+           
         }
 
         public async virtual Task<bool> Delete(IdType id)

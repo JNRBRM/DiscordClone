@@ -40,8 +40,9 @@ namespace DiscordClone.Api.Controllers
 
         [HttpPost("Register")]
         public async Task<ActionResult> Register([FromBody] RegisterModel Register)
-        {
-            return Ok(await _UserService.Register(Register));
+        { 
+            var data = await _UserService.Register(Register);
+            return Ok(data);
         }
 
         [HttpGet("activate/{token}")]

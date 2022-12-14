@@ -10,7 +10,7 @@ namespace DiscordClone.Api.Interface
 
         Task<T> Update(T Item);
 
-        Task<bool> Create(T Item);
+        Task<T> Create(T Item);
 
         Task<bool> Delete(Expression<Func<T, bool>> predicate);
 

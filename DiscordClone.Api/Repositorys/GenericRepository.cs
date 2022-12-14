@@ -26,11 +26,11 @@ namespace DiscordClone.Api.Repositorys
                 throw;
             }
         }
-        public async Task<bool> Create(T Item)
+        public async Task<T> Create(T Item)
         {
-            //_Context.Add(Item);
-            //await _Context.SaveChangesAsync();
-            return true;
+            _Context.Add(Item);
+            await _Context.SaveChangesAsync();
+            return Item;
         }
 
         public async virtual Task<bool> Delete(Type id)
@@ -63,7 +63,7 @@ namespace DiscordClone.Api.Repositorys
 
         public async virtual Task<T> Update(T Item)
         {
-            _Context.Entry(Item).State = EntityState.Modified;
+            _Context.Update(Item);
             await _Context.SaveChangesAsync();
             return Item;
         }
