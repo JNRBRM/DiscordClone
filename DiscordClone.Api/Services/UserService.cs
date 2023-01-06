@@ -22,8 +22,8 @@ namespace DiscordClone.Api.Services
         private readonly IUserRepository _UserRepository;
         private readonly IMemoryCache _Cache;
         private readonly Passwordhandler _PasswordHandler;
-        private readonly RegisterHandler _RegisterHandler;
         private readonly JWTSettings _JWTSettings;
+        private readonly JWTHandler jWTHandler = new();
         public UserService(IUserRepository UserRepository, IOptions<JWTSettings> jwtSettings, IMemoryCache cache) : base(UserRepository)
         {
             _UserRepository = UserRepository;
@@ -68,15 +68,26 @@ namespace DiscordClone.Api.Services
 
         public async Task<JWT> Login(string Email, string Password)
         {
-            User Userdate = await _UserRepository.FindByCondition(obj => obj.Email == Email);
+            //User Userdate = await _UserRepository.FindByCondition(obj => obj.Email == Email);
 
-            if (!await _PasswordHandler.checkPassword(Password,Userdate.Id))
+            // test data \\
+            User Userdate = new User
             {
-                return null;
-            }
+                Email = Email,
+                PhoneNumber = Password,
+                Account = new() { },
+                EmailConfirmed = true,
+                PhoneNumberConfirmed = true,
+
+            };
+            
+            //if (!await _PasswordHandler.checkPassword(Password,Userdate.Id))
+            //{
+            //    return null;
+            //}
 
             //  måske lave en klasse til at håndter token \\
-            var tokenHandler = new JwtSecurityTokenHandler();
+            /*var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_JWTSettings.Secret);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -92,7 +103,8 @@ namespace DiscordClone.Api.Services
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
-            return new JWT() { Token = tokenHandler.WriteToken(token) };
+            return new JWT() { Token = tokenHandler.WriteToken(token) };*/
+            return await jWTHandler.CreateJwt<User>(Userdate, _JWTSettings.Secret);
         }
         public async Task<bool> Register(RegisterModel Register)
         {
@@ -121,33 +133,5 @@ namespace DiscordClone.Api.Services
         }
         //4e2f49d9-e93e-435e-96bf-9fb4dbe32f43
         //hej2@lortemail.dk
-    }
-    public class RegisterHandler
-    {
-        private readonly UserService _UserService;
-        public async Task<User> UserMapping(string Email,string? PhoneNumber)
-        {
-            User user = new User
-            {
-                Email = Email,
-                PhoneNumber = PhoneNumber,
-                PasswordSetDate = DateTime.Now,
-                EmailConfirmed = false,
-                PhoneNumberConfirmed = false
-            };
-            return null;
-        }
-
-        public async Task<Account> AccountMapping(string Displayname,Guid id)
-        {
-            return new Account
-            {
-                UserId = id,
-                DisplayName = Displayname,
-                CreatedDate = DateTime.Now,
-                LastLogonDate = DateTime.Now,
-            };
-        }
-
     }
 }

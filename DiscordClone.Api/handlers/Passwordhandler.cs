@@ -72,7 +72,7 @@ namespace DiscordClone.Api.handlers
                 byte[] hash = pbkdf2.GetBytes(20);
                 SecurityCredentials credentials = new()
                 {
-                    Id = await _PasswordService.FindByCondition(obj => obj.UserId == Userid).Id,
+                    Id = _PasswordService.FindByCondition(obj => obj.UserId == Userid).Result.Id,
                     PasswordHash = hash,
                     Salt = salt,
                     UserId = Userid
