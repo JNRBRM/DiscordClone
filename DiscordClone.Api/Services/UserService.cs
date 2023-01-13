@@ -85,50 +85,36 @@ namespace DiscordClone.Api.Services
             //{
             //    return null;
             //}
-
-            //  måske lave en klasse til at håndter token \\
-            /*var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_JWTSettings.Secret);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim("id", Userdate.Id.ToString()),
-                    new Claim("Email", Userdate.Email), //ved ikke om vi skal bruge email
-                    new Claim("AccountId", Userdate.AccountId.ToString())
-                }),
-                Expires = DateTime.UtcNow.AddDays(1),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
-                SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-
-            return new JWT() { Token = tokenHandler.WriteToken(token) };*/
             return await jWTHandler.CreateJwt<User>(Userdate, _JWTSettings.Secret);
         }
         public async Task<bool> Register(RegisterModel Register)
         {
             EmailHandler handler = new();
+
             var cacheEntryOptions = new MemoryCacheEntryOptions()
                     .SetSlidingExpiration(TimeSpan.FromSeconds(86400))
                     .SetPriority(CacheItemPriority.Normal)
                     .SetSize(2);
+
             var uniqueId = Guid.NewGuid();
+
             if (_Cache.TryGetValue(_RegisterCacheKey, out List<CachedItem<RegisterModel, Guid>> registers))
             {
                 var attempt = registers.FirstOrDefault(x => x.Item.Email == Register.Email);
-                if (attempt==null)
+                if (attempt == null)
                 {
-                    registers.Add(new CachedItem<RegisterModel, Guid>() { Id=uniqueId,Item=Register});
+                    registers.Add(new CachedItem<RegisterModel, Guid>() { Id = uniqueId, Item = Register });
                 }
             }
             else
             {
                 List<CachedItem<RegisterModel, Guid>> currentRegisters = new();
                 currentRegisters.Add(new CachedItem<RegisterModel, Guid> { Id = uniqueId, Item = Register });
-               _Cache.Set(_RegisterCacheKey, currentRegisters, cacheEntryOptions);
+                _Cache.Set(_RegisterCacheKey, currentRegisters, cacheEntryOptions);
             }
+
             //var response=await handler.SendEmail(Register.Email,$"<a href=\"https://localhost:44329/api/User/activate/{uniqueId}\">hej</a>");
+            //var holder = jWTHandler.CreateJwt(Register, _JWTSettings.Secret);
             return true;
         }
         //4e2f49d9-e93e-435e-96bf-9fb4dbe32f43

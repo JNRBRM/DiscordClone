@@ -1,12 +1,16 @@
 ﻿using DiscordClone.Api.DataModels;
 using DiscordClone.Api.Entities;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Security;
+using System.Net.Sockets;
 using System.Reflection;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace DiscordClone.Api.handlers
@@ -15,10 +19,11 @@ namespace DiscordClone.Api.handlers
     {
         private readonly JWTSettings _jwtSettings;
         private readonly JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-        public async Task<JWT> CreateJwt<T>(T obj,string SECRET_KEY)
+
+        public async Task<JWT> CreateJwt<T>(T obj, string SECRET_KEY)
         {
             // Get the object's properties
-            var properties = obj.GetType().GetProperties().Where(p=>p.Name!= "Id");
+            var properties = obj.GetType().GetProperties().SkipLast(1);//.Where(p=>p.Name!= "Id");
             // Create a dictionary of the object's properties and their values
             Dictionary<string, object> payload = new Dictionary<string, object>();
             foreach (PropertyInfo property in obj.GetType().GetProperties())
@@ -28,102 +33,97 @@ namespace DiscordClone.Api.handlers
                     payload.Add(property.Name, property.GetValue(obj));
                 }
             }
-            //var payload = properties.ToDictionary(p =>
-            //{
-            //    Dictionary<string,object> holder = new();
-
-            //    if (!holder.ContainsKey(p.Name))
-            //    {
-            //        holder.Add(p.Name, p.GetValue(obj));
-            //    }
-            //    return holder;
-            //});
-            //var payload2 = properties.ToDictionary(p => p.Name, p => p.GetValue(obj));
-            // Use the dictionary to create a JWT
-            return Encode(payload, SECRET_KEY, JwtHashAlgorithm.HS256);
+            
+            //return Encode(payload, SECRET_KEY, JwtHashAlgorithm.HS256);
+            return Encode(payload, JwtHashAlgorithm.HS256);
         }
 
-        public JWT Encode<TKey, TValue>(Dictionary<TKey, TValue> load,string Secret, JwtHashAlgorithm algorithm)
+        public JWT Encode(Dictionary<string, object> load, JwtHashAlgorithm algorithm)
         {
-            List<Claim> claims = new();
-            foreach (var (key,value) in load)
+            var claims = new Claim[load.Count];
+            int i = 0;
+            foreach (var kvp in load)
             {
-                claims.Add(new Claim(key.ToString(), value.ToString()));
+                claims[i++] = new Claim(kvp.Key, kvp.Value.ToString());
             }
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddDays(2),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Secret)),
-                algorithm.ToString())
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(GenerateRandomKey()), algorithm.ToString())
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var jwt = new JWT { Token = tokenHandler.WriteToken(token) };
             var holder = Decoder<User>(jwt.Token);
             return jwt;
-            //return new JWT{ Token = tokenHandler.WriteToken(token) };
         }
 
+        private static byte[] GenerateRandomKey(int keySize = 256)
+        {
+            using (var rng = new RNGCryptoServiceProvider())
+            {
+                var key = new byte[keySize / 8];
+                rng.GetBytes(key);
+                return key;
+            }
+        }
 
+        //public JWT Encode<TKey, TValue>(Dictionary<TKey, TValue> load, string Secret, JwtHashAlgorithm algorithm)
+        //{
+        //    List<Claim> claims = new();
 
+        //    foreach (var (key, value) in load)
+        //    {
+        //        claims.Add(new Claim(key.ToString(), JsonConvert.SerializeObject(value)));
+        //    }
+        //    var tokenDescriptor = new SecurityTokenDescriptor
+        //    {
+        //        Subject = new ClaimsIdentity(claims),
+        //        Expires = DateTime.UtcNow.AddDays(2),
+        //        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Secret)),
+        //        algorithm.ToString())
+        //    };
+        //    var token = tokenHandler.CreateToken(tokenDescriptor);
+        //    return new JWT { Token = tokenHandler.WriteToken(token) };
+        //}
 
         public T Decoder<T>(string jwt) where T : new()
         {
             JwtSecurityToken token = tokenHandler.ReadJwtToken(jwt);
             T obj = new T();
+
+            var claimsDict = token.Claims.ToDictionary(c => c.Type);
             var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-            foreach (var property in properties)
+
+            var handlers = new Dictionary<Type, Action<T, Claim>>()
             {
-                var claim = token.Claims.FirstOrDefault(c => c.Type == property.Name);
-                if (claim == null) continue;
+                { typeof(Guid), (o, c) => o.GetType().GetProperty(c.Type).SetValue(o, Guid.Parse(c.Value)) },
+                { typeof(string), (o, c) => o.GetType().GetProperty(c.Type).SetValue(o, c.Value) },
+                { typeof(DateTime), (o, c) => o.GetType().GetProperty(c.Type).SetValue(o, DateTime.Parse(c.Value)) }
+            };
 
-                if (property.PropertyType.IsClass && property.PropertyType != typeof(string))
-                {
-                    // Property is a custom object, recurse
-                    continue;
-                    //var nestedObject = DecodeJwt(claim.Value, property.PropertyType);
-                    //property.SetValue(obj, nestedObject);
-                }
-                else if (property.PropertyType == typeof(Guid))
-                {
-                    // Property is a Guid, parse it
-                    var value = Guid.Parse(claim.Value);
-                    property.SetValue(obj, value);
-                }
-                else
-                {
-                    var value = Convert.ChangeType(claim.Value, property.PropertyType);
-                    property.SetValue(obj, value);
-                }
-            }
-
-            return obj;
-        }
-        private object DecodeJwt(string jwt, Type type)
-        {
-            JwtSecurityToken token = tokenHandler.ReadJwtToken(jwt);
-
-            var obj = Activator.CreateInstance(type);
-            foreach (var property in type.GetProperties())
+            for (int i = 0; i < properties.Length; i++)
             {
-                var claim = token.Claims.FirstOrDefault(c => c.Type == property.Name.ToLower());
-                if (claim != null)
+                var property = properties[i];
+                if (claimsDict.TryGetValue(property.Name, out Claim claim))
                 {
-                    if (property.PropertyType.IsClass && property.PropertyType != typeof(string))
+                    if (property.PropertyType.IsClass)
                     {
-                        // Property is a custom object, recurse
-                        var nestedObject = DecodeJwt(claim.Value, property.PropertyType);
-                        property.SetValue(obj, nestedObject);
+                        if (!handlers.TryGetValue(property.PropertyType, out Action<T, Claim> handler))
+                            continue;
+                        handler(obj, claim);
                     }
-                    else
+                    else if (!handlers.TryGetValue(property.PropertyType, out Action<T, Claim> handler))
                     {
-                        property.SetValue(obj, claim.Value);
+                        continue;
+                        handler(obj, claim);
                     }
                 }
             }
-
             return obj;
         }
+
+
     }
 }
 /*

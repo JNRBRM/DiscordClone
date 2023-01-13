@@ -1,6 +1,7 @@
 ﻿using DiscordClone.Api.DataModels;
 using DiscordClone.Api.Entities;
 using DiscordClone.Api.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
@@ -31,7 +32,7 @@ namespace DiscordClone.Api.Controllers
 
             if (Token is null)
             {
-                return NotFound("Account not found");
+                return Unauthorized("Account not found");
             }
 
             return Ok(Token);
@@ -48,6 +49,7 @@ namespace DiscordClone.Api.Controllers
         [HttpGet("activate/{token}")]
         public async Task<ActionResult> Activate(Guid token)
         {
+
             return Ok(await _UserService.Activate(token));
         }
     }
