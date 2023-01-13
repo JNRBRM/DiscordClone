@@ -1,6 +1,6 @@
 ﻿namespace DiscordClone.Api.Entities
 {
-    public class TextChannel : BaseChannel
+    public class TextChannel : BaseChannel<RoleGeneralTextChannelPermission>
     {
         //add mute sometime ye
         public List<TextChannelSetting> TextChannelSettings { get; set; }

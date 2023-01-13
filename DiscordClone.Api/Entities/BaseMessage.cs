@@ -8,7 +8,7 @@
         public DateTime CreatedDate { get; set; }
         public DateTime? EditedDate { get; set; }
         //public List<MessageAttachment> MessageAttachments { get; set; }
-        public List<BaseMessageAttachment<ChatType, ChatIdType>> MessageAttachments { get; set; }
+        
         public ChatType Chat { get; set; }
         public Account Account { get; set; }
 

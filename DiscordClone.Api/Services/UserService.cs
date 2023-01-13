@@ -37,9 +37,9 @@ namespace DiscordClone.Api.Services
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim("id", Userdate.Id.ToString()),
-                    new Claim("Email", Userdate.Email), //ved ikke om vi skal bruge email
-                    new Claim("AccountId", Userdate.AccountId.ToString())
+                    //new Claim("id", Userdate.Id.ToString()),
+                    //new Claim("Email", Userdate.Email), //ved ikke om vi skal bruge email
+                    //new Claim("AccountId", Userdate.AccountId.ToString())
                 }),
                 Expires = DateTime.UtcNow.AddDays(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),

@@ -1,6 +1,6 @@
 ﻿namespace DiscordClone.Api.Entities
 {
-    public class VoiceChannelSetting : BaseChannelSetting
+    public class VoiceChannelSetting : BaseChannelSetting<VoiceChannel>
     {
     }
 }

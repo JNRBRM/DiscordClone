@@ -2,5 +2,6 @@
 {
     public class GroupChatMessage: BaseMessage<GroupChat,Guid>
     {
+        public List<GroupChatMessageAttachment> MessageAttachments { get; set; }
     }
 }
