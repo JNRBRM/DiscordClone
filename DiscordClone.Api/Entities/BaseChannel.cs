@@ -7,6 +7,6 @@
 
         public bool IsAgeRestricted { get; set; }
         public List<RoleGeneralChannelPermission> GeneralPermissions { get; set; }
-        public abstract Server Server { get; set; }
+        public Server Server { get; set; }
     }
 }

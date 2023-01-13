@@ -23,7 +23,7 @@ namespace DiscordClone.Api.DBContext
         public DbSet<GroupChatMessageAttachment> GroupChatMessageAttachments { get; set; }
         public DbSet<ChatMessageAttachment> ChatMessageAttachments { get; set; }
         public DbSet<PreviousRegisteredEmailLookup> PreviousRegisteredEmailLookups { get; set; }
-        public DbSet<ProfileImage> ProfileImages { get; set; }
+        public DbSet<ServerProfileImage> ProfileImages { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<RoleGeneralChannelPermission> RoleGeneralChannelPermissions { get; set; }
         public DbSet<RoleGeneralServerPermission> RoleGeneralServerPermissions { get; set; }
@@ -64,7 +64,6 @@ namespace DiscordClone.Api.DBContext
                 model.HasKey(x => x.Id);
                 model.Property(x => x.Name).HasMaxLength(100).IsRequired();
                 model.Property(x => x.IsAgeRestricted).HasDefaultValue(false).IsRequired();
-
                 model.HasMany(x => x.GeneralPermissions).WithOne(x=>x.Entity).HasForeignKey(x=>x.EntityId);
             });
             modelBuilder.Entity<BaseChannel>().UseTpcMappingStrategy();
@@ -149,6 +148,12 @@ namespace DiscordClone.Api.DBContext
 
             });
             modelBuilder.Entity<BaseMessageAttachment<TextChannelMessage, int>>().UseTpcMappingStrategy();
+            modelBuilder.Entity<BaseRoleChannelPermission<BaseChannel>>(model =>
+            {
+                model.HasKey(x => x.Id);
+                model.HasOne(x => x.Role).WithMany(x => x.RoleGeneralChannelPermission).HasForeignKey(x => x.RoleId);
+                model.HasOne(x => x.Permission).WithMany().HasForeignKey(x => x.PermissionId);
+            });
             #endregion
 
             #region Add Entity
@@ -163,12 +168,11 @@ namespace DiscordClone.Api.DBContext
                 model.HasOne(x => x.Image).WithOne().HasForeignKey<Account>(x=>x.ImageId);
             });
             modelBuilder.Entity<Account>().UseTpcMappingStrategy().ToTable("Accounts");
-            modelBuilder.Entity<AccountGroupChat>(model =>
-            {
-            });
             modelBuilder.Entity<AccountImage>().UseTpcMappingStrategy().ToTable("AccountImages");
             modelBuilder.Entity<ChannelPermission>().UseTpcMappingStrategy().ToTable("ChannelPermissions");
             modelBuilder.Entity<Chat>().UseTpcMappingStrategy().ToTable("Chats");
+            modelBuilder.Entity<ChatMessage>().UseTpcMappingStrategy().ToTable("ChatMessages");
+            modelBuilder.Entity<ChatMessageAttachment>().UseTpcMappingStrategy().ToTable("ChatMessageAttachments");
             modelBuilder.Entity<Friend>()
                 .HasOne(x => x.Account1)
                 .WithMany()
@@ -180,7 +184,6 @@ namespace DiscordClone.Api.DBContext
                 .HasForeignKey(x => x.AccountId2);
             modelBuilder.Entity<Friend>(model =>
             {
-                model.HasKey(x => x.Id);
                 model.Property(x => x.Status).HasConversion<int>().IsRequired();
                 model.Property(x => x.SentDate).HasDefaultValueSql("getdate()").IsRequired();
             });
@@ -192,117 +195,53 @@ namespace DiscordClone.Api.DBContext
                 model.HasOne(x => x.Owner).WithOne(x => x.GroupChat).HasForeignKey<GroupChat>(x => x.OwnerId);
             });
             modelBuilder.Entity<GroupChat>().UseTpcMappingStrategy().ToTable("GroupChats");
-            
-            modelBuilder.Entity<ChatMessage>(model =>
-            {
-              
-            });
-            modelBuilder.Entity<ChatMessage>().UseTpcMappingStrategy().ToTable("ChatMessages");
-            
-            modelBuilder.Entity<BaseMessageAttachment<GroupChat,Guid>>(model =>
-            {
-              
-            });
-            modelBuilder.Entity<BaseMessageAttachment<GroupChat, Guid>>().UseTpcMappingStrategy();
+            modelBuilder.Entity<GroupChatMessage>().UseTpcMappingStrategy().ToTable("GroupChatMessages");
             modelBuilder.Entity<GroupChatMessageAttachment>().UseTpcMappingStrategy().ToTable("GroupChatMessageAttachments");
-            modelBuilder.Entity<ChatMessageAttachment>(model =>
-            {
-                
-            });
-            modelBuilder.Entity<ChatMessageAttachment>().ToTable("ChatMessageAttachments");
-
-            modelBuilder.Entity<BaseMessageAttachment<TextChannel, int>>().UseTpcMappingStrategy();
-            modelBuilder.Entity<BaseMessageAttachment<TextChannel, int>>(model =>
-            {
-                
-            });
-            modelBuilder.Entity<TextChannelMessageAttachment>().ToTable("TextChannelMessageAttachments");
-
-           
-
             modelBuilder.Entity<PreviousRegisteredEmailLookup>(model =>
             {
-                model.HasKey(x => x.Id);
                 model.Property(x => x.EmailHash).HasMaxLength(256).IsRequired();
                 model.Property(x => x.Salt).HasMaxLength(100).IsRequired();
-                //model.HasMany(x => x.Questions).WithOne(x => x.Lookup).HasForeignKey(x => x.LookupId);
-                //model.HasOne(x => x.Account).WithOne().HasForeignKey<PreviousRegisteredEmailLookup>(x => x.AccountId);
+                model.HasMany(x => x.Questions).WithOne(x => x.Lookup).HasForeignKey(x => x.LookupId);
+                model.HasOne(x => x.Account).WithOne().HasForeignKey<PreviousRegisteredEmailLookup>(x => x.AccountId);
             });
             modelBuilder.Entity<PreviousRegisteredEmailLookup>().UseTpcMappingStrategy().ToTable("PreviousRegisteredEmailLookups");
-           
-            
-            modelBuilder.Entity<ProfileImage>().UseTpcMappingStrategy().ToTable("ProfileImages");
-
             modelBuilder.Entity<Role>(model =>
             {
-                model.HasKey(x => x.Id);
                 model.Property(x=>x.Name).HasMaxLength(64).IsRequired();
                 model.Property(x => x.Description).HasMaxLength(100).IsRequired();
                 model.Property(x => x.CreatedDate).HasDefaultValueSql("getdate()").IsRequired();
                 model.Property(x=>x.IsServerAdmin).HasDefaultValue(false).IsRequired();
                 //lave måske en mellem table fx RoleServerProfile
-                //model.HasMany(x => x.Accounts).WithMany();
-                //model.HasMany(x => x.RoleGeneralServerPermission).WithOne(x => x.Role).HasForeignKey(x => x.RoleId);
-                //model.HasMany(x => x.RoleGeneralChannelPermission).WithOne(x => x.Role).HasForeignKey(x => x.RoleId);
-                //model.HasMany(x => x.RoleMembershipPermission).WithOne(x => x.Role).HasForeignKey(x => x.RoleId);
-                //model.HasMany(x => x.RoleTextChannelPermission).WithOne(x => x.Role).HasForeignKey(x => x.RoleId);
-                //model.HasMany(x => x.RoleVoiceChannelPermission).WithOne(x => x.Role).HasForeignKey(x => x.RoleId);
-                //model.HasOne(x=>x.Server).WithMany(x=>x.Roles).HasForeignKey(x=>x.ServerId);
+                //model.HasMany(x => x.Profiles).WithMany();
+                model.HasMany(x => x.RoleGeneralServerPermission).WithOne(x => x.Role).HasForeignKey(x => x.RoleId);
+                model.HasMany(x => x.RoleGeneralChannelPermission).WithOne(x => x.Role).HasForeignKey(x => x.RoleId);
+                model.HasMany(x => x.RoleMembershipPermission).WithOne(x => x.Role).HasForeignKey(x => x.RoleId);
+                model.HasMany(x => x.RoleTextChannelPermission).WithOne(x => x.Role).HasForeignKey(x => x.RoleId);
+                model.HasMany(x => x.RoleVoiceChannelPermission).WithOne(x => x.Role).HasForeignKey(x => x.RoleId);
+                model.HasOne(x=>x.Server).WithMany(x=>x.Roles).HasForeignKey(x=>x.ServerId);
             });
             modelBuilder.Entity<Role>().UseTpcMappingStrategy().ToTable("Roles");
             modelBuilder.Entity<RoleGeneralChannelPermission>(model =>
             {
-                model.HasKey(x => x.Id);
-                model.HasOne(x => x.Role).WithMany(x=>x.RoleGeneralChannelPermission).HasForeignKey(x => x.RoleId);
+                model.HasOne(x => x.Entity).WithMany(x=>x.GeneralPermissions).HasForeignKey(x => x.EntityId);
                 model.HasOne(x => x.Permission).WithOne().HasForeignKey<RoleGeneralChannelPermission>(x => x.PermissionId);
-
-                //model.HasMany(x => x.Entity.Accounts);
-                //model.HasOne(x => x.Entity.Server).WithOne().HasForeignKey<RoleGeneralChannelPermission>(x=>x.Entity.ServerId);
-
-                //model.Property(x => x.Entity.Name).HasMaxLength(100).IsRequired();
-                //model.Property(x => x.Entity.IsAgeRestricted).HasDefaultValue(false).IsRequired();
             });
             modelBuilder.Entity<RoleGeneralChannelPermission>().UseTpcMappingStrategy().ToTable("RoleGeneralChannelPermissions");
-            modelBuilder.Entity<RoleGeneralServerPermission>(model =>
-            {
-                model.HasKey(x => x.Id);
-                //model.HasOne(x => x.Role).WithMany(x => x.RoleGeneralServerPermission).HasForeignKey(x => x.RoleId);
-                //model.HasOne(x => x.Permission).WithOne().HasForeignKey<RoleGeneralServerPermission>(x => x.PermissionId);
-            });
             modelBuilder.Entity<RoleGeneralServerPermission>().UseTpcMappingStrategy().ToTable("RoleGeneralServerPermissions");
-            modelBuilder.Entity<RoleMembershipPermission>(model =>
-            {
-                model.HasKey(x => x.Id);
-                //model.HasOne(x => x.Role).WithMany(x => x.RoleMembershipPermission).HasForeignKey(x => x.RoleId);
-                //model.HasOne(x => x.Permission).WithOne().HasForeignKey<RoleMembershipPermission>(x => x.PermissionId);
-            });
             modelBuilder.Entity<RoleMembershipPermission>().UseTpcMappingStrategy().ToTable("RoleMembershipPermissions");
             modelBuilder.Entity<RoleTextChannelPermission>(model =>
             {
-                model.HasKey(x => x.Id);
-                //model.HasOne(x => x.Role).WithMany(x => x.RoleTextChannelPermission).HasForeignKey(x => x.RoleId);
-                //model.HasOne(x => x.Permission).WithOne().HasForeignKey<RoleTextChannelPermission>(x => x.PermissionId);
-
-                //model.HasMany(x => x.Entity.Accounts);
-                //model.HasOne(x => x.Entity.Server).WithOne().HasForeignKey<RoleGeneralChannelPermission>(x => x.Entity.ServerId);
-
-                //model.Property(x => x.Entity.Name).HasMaxLength(100).IsRequired();
-                //model.Property(x => x.Entity.IsAgeRestricted).HasDefaultValue(false).IsRequired();
+                model.HasOne(x => x.Entity).WithMany(x => x.Permissions).HasForeignKey(x => x.EntityId);
+                model.HasOne(x => x.Permission).WithOne().HasForeignKey<RoleTextChannelPermission>(x => x.PermissionId);
             });
             modelBuilder.Entity<RoleTextChannelPermission>().UseTpcMappingStrategy().ToTable("RoleTextChannelPermissions");
             modelBuilder.Entity<RoleVoiceChannelPermission>(model =>
             {
-                model.HasKey(x => x.Id);
-                //model.HasOne(x => x.Role).WithMany(x => x.RoleVoiceChannelPermission).HasForeignKey(x => x.RoleId);
-                //model.HasOne(x => x.Permission).WithOne().HasForeignKey<RoleVoiceChannelPermission>(x => x.PermissionId);
-
-                //model.HasMany(x => x.Entity.Accounts);
-                //model.HasOne(x => x.Entity.Server).WithOne().HasForeignKey<RoleVoiceChannelPermission>(x => x.Entity.ServerId);
-
-                //model.Property(x => x.Entity.Name).HasMaxLength(100).IsRequired();
-                //model.Property(x => x.Entity.IsAgeRestricted).HasDefaultValue(false).IsRequired();
+                model.HasOne(x => x.Entity).WithMany(x => x.Permissions).HasForeignKey(x => x.EntityId);
+                model.HasOne(x => x.Permission).WithOne().HasForeignKey<RoleVoiceChannelPermission>(x => x.PermissionId);
             });
             modelBuilder.Entity<RoleVoiceChannelPermission>().UseTpcMappingStrategy().ToTable("RoleVoiceChannelPermissions");
+            modelBuilder.Entity<ServerProfileImage>().UseTpcMappingStrategy().ToTable("ProfileImages");
             modelBuilder.Entity<SecurityCredentials>(model =>
             {
                 model.HasKey(x => x.Id);
@@ -333,69 +272,65 @@ namespace DiscordClone.Api.DBContext
 
             });
             modelBuilder.Entity<Server>().UseTpcMappingStrategy().ToTable("Servers");
+            modelBuilder.Entity<TextChannelMessageAttachment>().ToTable("TextChannelMessageAttachments");
 
             
             modelBuilder.Entity<ServerPermission>().ToTable("ServerPermissions");
             modelBuilder.Entity<ServerProfile>(model =>
             {
-                model.HasKey(x => x.Id);
                 model.Property(x=>x.NickName).HasMaxLength(32).IsRequired();
-                //model.HasOne(x => x.Image).WithOne().HasForeignKey<ServerProfile>(x => x.ProfileImageId);
-                //model.HasOne(x => x.Account).WithMany().HasForeignKey(x => x.AccountId);
-                //model.HasOne(x => x.Server).WithMany(x=>x.ServerProfiles).HasForeignKey(x => x.ServerId)
-                //.OnDelete(DeleteBehavior.Restrict);
+                model.HasOne(x => x.Image).WithOne().HasForeignKey<ServerProfile>(x => x.ProfileImageId);
+                model.HasOne(x => x.Account).WithMany(x=>x.ServerProfiles).HasForeignKey(x => x.AccountId);
+                model.HasOne(x => x.Server).WithMany(x=>x.ServerProfiles).HasForeignKey(x => x.ServerId).OnDelete(DeleteBehavior.Cascade);
             });
             modelBuilder.Entity<ServerProfile>().UseTpcMappingStrategy().ToTable("ServerProfiles");
             
             modelBuilder.Entity<TextChannel>(model =>
             {
-                model.HasMany(x => x.Permissions).WithOne(x => x.Entity).HasForeignKey(x => x.EntityId).OnDelete(DeleteBehavior.Cascade);
                 model.HasOne(x => x.Server).WithMany(x => x.TextChannels).HasForeignKey(x => x.ServerId).OnDelete(DeleteBehavior.Cascade);
-                //model.HasMany(x => x.ServerProfile).WithMany();
-                //model.HasOne(x => x.Server).WithMany(x=>x.TextChannels).HasForeignKey(x => x.ServerId);
-                model.HasMany(x => x.TextChannelSettings).WithOne().HasForeignKey(x=>x.ChannelId).OnDelete(DeleteBehavior.Cascade);
+                model.HasMany(x => x.TextChannelSettings).WithOne(x=>(TextChannel)x.Channel).HasForeignKey(x=>x.ChannelId).OnDelete(DeleteBehavior.Cascade);
                 model.HasMany(x => x.Messages).WithOne(x=>x.Chat).HasForeignKey(x=>x.ChatId).OnDelete(DeleteBehavior.Cascade);
-
             });
             modelBuilder.Entity<TextChannel>().UseTpcMappingStrategy().ToTable("TextChannels");
-            modelBuilder.Entity<TextChannelSetting>(model =>
+            modelBuilder.Entity<TextChannel>(model =>
             {
-                model.HasKey(x => x.Id);
-                
+                model.HasOne(x => x.Server).WithMany(x => x.TextChannels).HasForeignKey(x => x.ServerId).OnDelete(DeleteBehavior.Cascade);
+                model.HasMany(x => x.TextChannelSettings).WithOne(x => (TextChannel)x.Channel).HasForeignKey(x => x.ChannelId).OnDelete(DeleteBehavior.Cascade);
+                model.HasMany(x => x.Messages).WithOne(x => x.Chat).HasForeignKey(x => x.ChatId).OnDelete(DeleteBehavior.Cascade);
+            });
+            modelBuilder.Entity<TextChannel>().UseTpcMappingStrategy().ToTable("TextChannels");
+            //modelBuilder.Entity<TextChannelSetting>(model =>
+            //{
+            //    model.HasKey(x => x.Id);
+            //    model.Property(x => x.Name).HasMaxLength(100).IsRequired();
+            //    model.Property(x => x.Parameter).HasMaxLength(100).IsRequired();
+            //    model.Property(x => x.Description).HasMaxLength(100).IsRequired();
+            //    model.HasOne(x => x.Channel).WithMany(x => x.TextChannelSettings).HasForeignKey(x => x.ChannelId);
 
-             });
+            //});
             modelBuilder.Entity<TextChannelSetting>().UseTpcMappingStrategy().ToTable("TextChannelSettings");
             modelBuilder.Entity<User>(model =>
             {
-                model.HasKey(x => x.Id);
                 model.Property(x=>x.Email).HasMaxLength(100).IsRequired();
                 model.Property(x=>x.PhoneNumber).HasMaxLength(10).IsRequired();
                 model.Property(x=>x.EmailConfirmed).HasDefaultValue(false).IsRequired();
                 model.Property(x=>x.PhoneNumberConfirmed).HasDefaultValue(false).IsRequired();
                 model.Property(x=>x.PasswordSetDate).HasDefaultValueSql("getdate()").IsRequired();
-                //model.HasOne(x => x.Account).WithOne(x => x.User).HasForeignKey<User>(x => x.AccountId);
+                model.HasOne(x => x.Account).WithOne(x => x.User).HasForeignKey<Account>(x => x.UserId).OnDelete(DeleteBehavior.NoAction);
             });
             modelBuilder.Entity<User>().UseTpcMappingStrategy().ToTable("Users");
             modelBuilder.Entity<VoiceChannel>(model =>
             {
-                ////model.HasKey(x => x.Id);
-
-                //model.HasMany(x => x.ServerProfile).WithMany();
-                //model.HasOne(x => x.Server).WithMany(x=>x.VoiceChannels).HasForeignKey(x => x.ServerId);
-                ////model.Property(x => x.Name).HasMaxLength(100).IsRequired();
-                ////model.Property(x => x.IsAgeRestricted).HasDefaultValue(false).IsRequired();
-                //model.HasMany(x => x.VoiceChannelSettings).WithOne();
+                model.HasMany(x => x.VoiceChannelSettings).WithOne(x=>x.Channel).HasForeignKey(x=>x.ChannelId);
             });
             modelBuilder.Entity<VoiceChannel>().UseTpcMappingStrategy().ToTable("VoiceChannels");
-            modelBuilder.Entity<VoiceChannelSetting>(model =>
-            {
-                model.HasKey(x => x.Id);
-                model.Property(x => x.Name).HasMaxLength(100).IsRequired();
-                model.Property(x => x.Parameter).HasMaxLength(100).IsRequired();
-                model.Property(x => x.Description).HasMaxLength(100).IsRequired();
-               // model.HasOne(x => x.Channel).WithMany().HasForeignKey(x => x.ChannelId);
-
-            }); 
+            //modelBuilder.Entity<VoiceChannelSetting>(model =>
+            //{
+            //    model.Property(x => x.Name).HasMaxLength(100).IsRequired();
+            //    model.Property(x => x.Parameter).HasMaxLength(100).IsRequired();
+            //    model.Property(x => x.Description).HasMaxLength(100).IsRequired();
+            //    model.HasOne(x => x.Channel).WithMany(x => x.VoiceChannelSettings).HasForeignKey(x => x.ChannelId);
+            //});
             modelBuilder.Entity<VoiceChannelSetting>().UseTpcMappingStrategy().ToTable("VoiceChannelSettings");
             #endregion
         }
