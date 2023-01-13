@@ -4,7 +4,6 @@
     {
         public int AccountId { get; set; }
         public int ServerId { get; set; }
-        public int ProfileImageId { get; set; }
         public string NickName { get; set; }
         public ServerProfileImage Image { get; set; }
         public Account Account { get; set; }
