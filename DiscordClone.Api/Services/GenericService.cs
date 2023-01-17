@@ -1,4 +1,4 @@
-﻿using DiscordClone.Api.Entities;
+﻿using DiscordClone.Api.Entities.Base;
 using DiscordClone.Api.Interface;
 using System.Linq.Expressions;
 

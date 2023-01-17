@@ -1,4 +1,6 @@
 ﻿using System.Text.Json.Serialization;
+using DiscordClone.Api.Entities.Base;
+using DiscordClone.Api.Entities.ServerRelated;
 
 namespace DiscordClone.Api.Entities
 {

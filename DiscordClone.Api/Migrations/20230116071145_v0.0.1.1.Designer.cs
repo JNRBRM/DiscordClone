@@ -4,6 +4,7 @@ using DiscordClone.Api.DBContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DiscordClone.Api.Migrations
 {
     [DbContext(typeof(DiscordCloneContext))]
-    partial class DiscordCloneContextModelSnapshot : ModelSnapshot
+    [Migration("20230116071145_v0.0.1.1")]
+    partial class v0011
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,7 +27,7 @@ namespace DiscordClone.Api.Migrations
 
             modelBuilder.HasSequence("BaseEntitySequence");
 
-            modelBuilder.Entity("DiscordClone.Api.Entities.Base.BaseEntity<System.Guid>", b =>
+            modelBuilder.Entity("DiscordClone.Api.Entities.BaseEntity<System.Guid>", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -37,7 +40,7 @@ namespace DiscordClone.Api.Migrations
                     b.UseTpcMappingStrategy();
                 });
 
-            modelBuilder.Entity("DiscordClone.Api.Entities.Base.BaseEntity<int>", b =>
+            modelBuilder.Entity("DiscordClone.Api.Entities.BaseEntity<int>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -53,9 +56,9 @@ namespace DiscordClone.Api.Migrations
                     b.UseTpcMappingStrategy();
                 });
 
-            modelBuilder.Entity("DiscordClone.Api.Entities.Base.BaseChat<DiscordClone.Api.Entities.ChatMessage, DiscordClone.Api.Entities.AccountChat>", b =>
+            modelBuilder.Entity("DiscordClone.Api.Entities.BaseChat<DiscordClone.Api.Entities.ChatMessage, DiscordClone.Api.Entities.AccountChat>", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseEntity<System.Guid>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseEntity<System.Guid>");
 
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
@@ -63,9 +66,9 @@ namespace DiscordClone.Api.Migrations
                         .HasDefaultValueSql("getdate()");
                 });
 
-            modelBuilder.Entity("DiscordClone.Api.Entities.Base.BaseChat<DiscordClone.Api.Entities.GroupChatMessage, DiscordClone.Api.Entities.AccountGroupChat>", b =>
+            modelBuilder.Entity("DiscordClone.Api.Entities.BaseChat<DiscordClone.Api.Entities.GroupChatMessage, DiscordClone.Api.Entities.AccountGroupChat>", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseEntity<System.Guid>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseEntity<System.Guid>");
 
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
@@ -75,7 +78,7 @@ namespace DiscordClone.Api.Migrations
 
             modelBuilder.Entity("DiscordClone.Api.Entities.SecurityCredentials", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseEntity<System.Guid>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseEntity<System.Guid>");
 
                     b.Property<byte[]>("PasswordHash")
                         .IsRequired()
@@ -99,7 +102,7 @@ namespace DiscordClone.Api.Migrations
 
             modelBuilder.Entity("DiscordClone.Api.Entities.User", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseEntity<System.Guid>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseEntity<System.Guid>");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -131,7 +134,7 @@ namespace DiscordClone.Api.Migrations
 
             modelBuilder.Entity("DiscordClone.Api.Entities.Account", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseEntity<int>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseEntity<int>");
 
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
@@ -165,7 +168,7 @@ namespace DiscordClone.Api.Migrations
 
             modelBuilder.Entity("DiscordClone.Api.Entities.AccountChat", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseEntity<int>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseEntity<int>");
 
                     b.Property<int>("AccountId")
                         .HasColumnType("int");
@@ -177,29 +180,32 @@ namespace DiscordClone.Api.Migrations
 
                     b.HasIndex("ChatId");
 
-                    b.ToTable("AccountChats", (string)null);
+                    b.ToTable("AccountChats");
                 });
 
             modelBuilder.Entity("DiscordClone.Api.Entities.AccountGroupChat", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseEntity<int>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseEntity<int>");
 
                     b.Property<int>("AccountId")
                         .HasColumnType("int");
+
+                    b.Property<Guid?>("BaseChatId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("ChatId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasIndex("AccountId");
 
-                    b.HasIndex("ChatId");
+                    b.HasIndex("BaseChatId");
 
-                    b.ToTable("AccountGroupChats", (string)null);
+                    b.ToTable("AccountGroupChats");
                 });
 
-            modelBuilder.Entity("DiscordClone.Api.Entities.Base.BaseChannel<DiscordClone.Api.Entities.RoleGeneralTextChannelPermission>", b =>
+            modelBuilder.Entity("DiscordClone.Api.Entities.BaseChannel<DiscordClone.Api.Entities.RoleGeneralTextChannelPermission>", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseEntity<int>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseEntity<int>");
 
                     b.Property<bool>("IsAgeRestricted")
                         .ValueGeneratedOnAdd()
@@ -215,9 +221,9 @@ namespace DiscordClone.Api.Migrations
                         .HasColumnType("int");
                 });
 
-            modelBuilder.Entity("DiscordClone.Api.Entities.Base.BaseChannel<DiscordClone.Api.Entities.RoleGeneralVoiceChannelPermission>", b =>
+            modelBuilder.Entity("DiscordClone.Api.Entities.BaseChannel<DiscordClone.Api.Entities.RoleGeneralVoiceChannelPermission>", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseEntity<int>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseEntity<int>");
 
                     b.Property<bool>("IsAgeRestricted")
                         .ValueGeneratedOnAdd()
@@ -233,9 +239,9 @@ namespace DiscordClone.Api.Migrations
                         .HasColumnType("int");
                 });
 
-            modelBuilder.Entity("DiscordClone.Api.Entities.Base.BaseChannelSetting<DiscordClone.Api.Entities.TextChannel>", b =>
+            modelBuilder.Entity("DiscordClone.Api.Entities.BaseChannelSetting<DiscordClone.Api.Entities.TextChannel>", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseEntity<int>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseEntity<int>");
 
                     b.Property<int>("ChannelId")
                         .HasColumnType("int");
@@ -256,9 +262,9 @@ namespace DiscordClone.Api.Migrations
                         .HasColumnType("nvarchar(100)");
                 });
 
-            modelBuilder.Entity("DiscordClone.Api.Entities.Base.BaseChannelSetting<DiscordClone.Api.Entities.VoiceChannel>", b =>
+            modelBuilder.Entity("DiscordClone.Api.Entities.BaseChannelSetting<DiscordClone.Api.Entities.VoiceChannel>", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseEntity<int>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseEntity<int>");
 
                     b.Property<int>("ChannelId")
                         .HasColumnType("int");
@@ -279,9 +285,9 @@ namespace DiscordClone.Api.Migrations
                         .HasColumnType("nvarchar(100)");
                 });
 
-            modelBuilder.Entity("DiscordClone.Api.Entities.Base.BaseImage", b =>
+            modelBuilder.Entity("DiscordClone.Api.Entities.BaseImage", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseEntity<int>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseEntity<int>");
 
                     b.Property<byte[]>("Bytes")
                         .IsRequired()
@@ -297,9 +303,9 @@ namespace DiscordClone.Api.Migrations
                         .HasColumnType("decimal(8,0)");
                 });
 
-            modelBuilder.Entity("DiscordClone.Api.Entities.Base.BaseMessage<DiscordClone.Api.Entities.Chat, System.Guid>", b =>
+            modelBuilder.Entity("DiscordClone.Api.Entities.BaseMessage<DiscordClone.Api.Entities.Chat, System.Guid>", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseEntity<int>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseEntity<int>");
 
                     b.Property<int>("AccountId")
                         .HasColumnType("int");
@@ -326,9 +332,9 @@ namespace DiscordClone.Api.Migrations
                     b.HasIndex("AccountId");
                 });
 
-            modelBuilder.Entity("DiscordClone.Api.Entities.Base.BaseMessage<DiscordClone.Api.Entities.GroupChat, System.Guid>", b =>
+            modelBuilder.Entity("DiscordClone.Api.Entities.BaseMessage<DiscordClone.Api.Entities.GroupChat, System.Guid>", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseEntity<int>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseEntity<int>");
 
                     b.Property<int>("AccountId")
                         .HasColumnType("int");
@@ -355,9 +361,9 @@ namespace DiscordClone.Api.Migrations
                     b.HasIndex("AccountId");
                 });
 
-            modelBuilder.Entity("DiscordClone.Api.Entities.Base.BaseMessageAttachment<DiscordClone.Api.Entities.Chat, System.Guid, DiscordClone.Api.Entities.ChatMessage>", b =>
+            modelBuilder.Entity("DiscordClone.Api.Entities.BaseMessageAttachment<DiscordClone.Api.Entities.Chat, System.Guid, DiscordClone.Api.Entities.ChatMessage>", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseEntity<int>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseEntity<int>");
 
                     b.Property<string>("FileLocation")
                         .IsRequired()
@@ -371,9 +377,9 @@ namespace DiscordClone.Api.Migrations
                         .HasColumnType("int");
                 });
 
-            modelBuilder.Entity("DiscordClone.Api.Entities.Base.BaseMessageAttachment<DiscordClone.Api.Entities.GroupChat, System.Guid, DiscordClone.Api.Entities.GroupChatMessage>", b =>
+            modelBuilder.Entity("DiscordClone.Api.Entities.BaseMessageAttachment<DiscordClone.Api.Entities.GroupChat, System.Guid, DiscordClone.Api.Entities.GroupChatMessage>", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseEntity<int>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseEntity<int>");
 
                     b.Property<string>("FileLocation")
                         .IsRequired()
@@ -387,9 +393,9 @@ namespace DiscordClone.Api.Migrations
                         .HasColumnType("int");
                 });
 
-            modelBuilder.Entity("DiscordClone.Api.Entities.Base.BaseMessageAttachment<DiscordClone.Api.Entities.TextChannel, int, DiscordClone.Api.Entities.TextChannelMessage>", b =>
+            modelBuilder.Entity("DiscordClone.Api.Entities.BaseMessageAttachment<DiscordClone.Api.Entities.TextChannel, int, DiscordClone.Api.Entities.TextChannelMessage>", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseEntity<int>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseEntity<int>");
 
                     b.Property<string>("FileLocation")
                         .IsRequired()
@@ -403,9 +409,9 @@ namespace DiscordClone.Api.Migrations
                         .HasColumnType("int");
                 });
 
-            modelBuilder.Entity("DiscordClone.Api.Entities.Base.BasePermission", b =>
+            modelBuilder.Entity("DiscordClone.Api.Entities.BasePermission", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseEntity<int>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseEntity<int>");
 
                     b.Property<string>("Action")
                         .IsRequired()
@@ -418,9 +424,9 @@ namespace DiscordClone.Api.Migrations
                         .HasColumnType("nvarchar(96)");
                 });
 
-            modelBuilder.Entity("DiscordClone.Api.Entities.Base.BaseRolePermission", b =>
+            modelBuilder.Entity("DiscordClone.Api.Entities.BaseRolePermission", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseEntity<int>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseEntity<int>");
 
                     b.Property<int>("PermissionId")
                         .HasColumnType("int");
@@ -434,7 +440,7 @@ namespace DiscordClone.Api.Migrations
 
             modelBuilder.Entity("DiscordClone.Api.Entities.Friend", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseEntity<int>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseEntity<int>");
 
                     b.Property<int?>("AccountId")
                         .HasColumnType("int");
@@ -464,7 +470,7 @@ namespace DiscordClone.Api.Migrations
 
             modelBuilder.Entity("DiscordClone.Api.Entities.PreviousRegisteredEmailLookup", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseEntity<int>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseEntity<int>");
 
                     b.Property<int>("AccountId")
                         .HasColumnType("int");
@@ -488,7 +494,7 @@ namespace DiscordClone.Api.Migrations
 
             modelBuilder.Entity("DiscordClone.Api.Entities.Role", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseEntity<int>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseEntity<int>");
 
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
@@ -520,7 +526,7 @@ namespace DiscordClone.Api.Migrations
 
             modelBuilder.Entity("DiscordClone.Api.Entities.SecurityQuestion", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseEntity<int>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseEntity<int>");
 
                     b.Property<string>("Answer")
                         .IsRequired()
@@ -542,7 +548,7 @@ namespace DiscordClone.Api.Migrations
 
             modelBuilder.Entity("DiscordClone.Api.Entities.Server", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseEntity<int>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseEntity<int>");
 
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
@@ -566,7 +572,7 @@ namespace DiscordClone.Api.Migrations
 
             modelBuilder.Entity("DiscordClone.Api.Entities.ServerProfile", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseEntity<int>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseEntity<int>");
 
                     b.Property<int>("AccountId")
                         .HasColumnType("int");
@@ -593,7 +599,7 @@ namespace DiscordClone.Api.Migrations
 
             modelBuilder.Entity("DiscordClone.Api.Entities.TextChannelMessage", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseEntity<int>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseEntity<int>");
 
                     b.Property<int>("AccountId")
                         .HasColumnType("int");
@@ -620,14 +626,14 @@ namespace DiscordClone.Api.Migrations
 
             modelBuilder.Entity("DiscordClone.Api.Entities.Chat", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseChat<DiscordClone.Api.Entities.ChatMessage, DiscordClone.Api.Entities.AccountChat>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseChat<DiscordClone.Api.Entities.ChatMessage, DiscordClone.Api.Entities.AccountChat>");
 
                     b.ToTable("Chats", (string)null);
                 });
 
             modelBuilder.Entity("DiscordClone.Api.Entities.GroupChat", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseChat<DiscordClone.Api.Entities.GroupChatMessage, DiscordClone.Api.Entities.AccountGroupChat>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseChat<DiscordClone.Api.Entities.GroupChatMessage, DiscordClone.Api.Entities.AccountGroupChat>");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -646,7 +652,7 @@ namespace DiscordClone.Api.Migrations
 
             modelBuilder.Entity("DiscordClone.Api.Entities.TextChannel", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseChannel<DiscordClone.Api.Entities.RoleGeneralTextChannelPermission>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseChannel<DiscordClone.Api.Entities.RoleGeneralTextChannelPermission>");
 
                     b.HasIndex("ServerId");
 
@@ -655,7 +661,7 @@ namespace DiscordClone.Api.Migrations
 
             modelBuilder.Entity("DiscordClone.Api.Entities.VoiceChannel", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseChannel<DiscordClone.Api.Entities.RoleGeneralVoiceChannelPermission>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseChannel<DiscordClone.Api.Entities.RoleGeneralVoiceChannelPermission>");
 
                     b.HasIndex("ServerId");
 
@@ -664,7 +670,7 @@ namespace DiscordClone.Api.Migrations
 
             modelBuilder.Entity("DiscordClone.Api.Entities.TextChannelSetting", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseChannelSetting<DiscordClone.Api.Entities.TextChannel>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseChannelSetting<DiscordClone.Api.Entities.TextChannel>");
 
                     b.HasIndex("ChannelId");
 
@@ -673,7 +679,7 @@ namespace DiscordClone.Api.Migrations
 
             modelBuilder.Entity("DiscordClone.Api.Entities.VoiceChannelSetting", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseChannelSetting<DiscordClone.Api.Entities.VoiceChannel>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseChannelSetting<DiscordClone.Api.Entities.VoiceChannel>");
 
                     b.HasIndex("ChannelId");
 
@@ -682,14 +688,14 @@ namespace DiscordClone.Api.Migrations
 
             modelBuilder.Entity("DiscordClone.Api.Entities.AccountImage", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseImage");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseImage");
 
                     b.ToTable("AccountImages", (string)null);
                 });
 
             modelBuilder.Entity("DiscordClone.Api.Entities.ServerProfileImage", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseImage");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseImage");
 
                     b.Property<int>("ServerProfileId")
                         .HasColumnType("int");
@@ -703,7 +709,7 @@ namespace DiscordClone.Api.Migrations
 
             modelBuilder.Entity("DiscordClone.Api.Entities.ChatMessage", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseMessage<DiscordClone.Api.Entities.Chat, System.Guid>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseMessage<DiscordClone.Api.Entities.Chat, System.Guid>");
 
                     b.HasIndex("ChatId");
 
@@ -712,7 +718,7 @@ namespace DiscordClone.Api.Migrations
 
             modelBuilder.Entity("DiscordClone.Api.Entities.GroupChatMessage", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseMessage<DiscordClone.Api.Entities.GroupChat, System.Guid>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseMessage<DiscordClone.Api.Entities.GroupChat, System.Guid>");
 
                     b.HasIndex("ChatId");
 
@@ -721,7 +727,7 @@ namespace DiscordClone.Api.Migrations
 
             modelBuilder.Entity("DiscordClone.Api.Entities.ChatMessageAttachment", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseMessageAttachment<DiscordClone.Api.Entities.Chat, System.Guid, DiscordClone.Api.Entities.ChatMessage>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseMessageAttachment<DiscordClone.Api.Entities.Chat, System.Guid, DiscordClone.Api.Entities.ChatMessage>");
 
                     b.HasIndex("MessageId");
 
@@ -730,7 +736,7 @@ namespace DiscordClone.Api.Migrations
 
             modelBuilder.Entity("DiscordClone.Api.Entities.GroupChatMessageAttachment", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseMessageAttachment<DiscordClone.Api.Entities.GroupChat, System.Guid, DiscordClone.Api.Entities.GroupChatMessage>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseMessageAttachment<DiscordClone.Api.Entities.GroupChat, System.Guid, DiscordClone.Api.Entities.GroupChatMessage>");
 
                     b.HasIndex("MessageId");
 
@@ -739,7 +745,7 @@ namespace DiscordClone.Api.Migrations
 
             modelBuilder.Entity("DiscordClone.Api.Entities.TextChannelMessageAttachment", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseMessageAttachment<DiscordClone.Api.Entities.TextChannel, int, DiscordClone.Api.Entities.TextChannelMessage>");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseMessageAttachment<DiscordClone.Api.Entities.TextChannel, int, DiscordClone.Api.Entities.TextChannelMessage>");
 
                     b.HasIndex("MessageId");
 
@@ -748,21 +754,21 @@ namespace DiscordClone.Api.Migrations
 
             modelBuilder.Entity("DiscordClone.Api.Entities.ChannelPermission", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BasePermission");
+                    b.HasBaseType("DiscordClone.Api.Entities.BasePermission");
 
                     b.ToTable("ChannelPermissions", (string)null);
                 });
 
             modelBuilder.Entity("DiscordClone.Api.Entities.ServerPermission", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BasePermission");
+                    b.HasBaseType("DiscordClone.Api.Entities.BasePermission");
 
                     b.ToTable("ServerPermissions", (string)null);
                 });
 
             modelBuilder.Entity("DiscordClone.Api.Entities.RoleGeneralServerPermission", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseRolePermission");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseRolePermission");
 
                     b.HasIndex("RoleId");
 
@@ -771,7 +777,7 @@ namespace DiscordClone.Api.Migrations
 
             modelBuilder.Entity("DiscordClone.Api.Entities.RoleGeneralVoiceChannelPermission", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseRolePermission");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseRolePermission");
 
                     b.Property<int>("EntityId")
                         .HasColumnType("int");
@@ -785,7 +791,7 @@ namespace DiscordClone.Api.Migrations
 
             modelBuilder.Entity("DiscordClone.Api.Entities.RoleMembershipPermission", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseRolePermission");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseRolePermission");
 
                     b.HasIndex("RoleId");
 
@@ -794,7 +800,7 @@ namespace DiscordClone.Api.Migrations
 
             modelBuilder.Entity("DiscordClone.Api.Entities.RoleTextChannelPermission", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseRolePermission");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseRolePermission");
 
                     b.Property<int>("EntityId")
                         .HasColumnType("int");
@@ -808,7 +814,7 @@ namespace DiscordClone.Api.Migrations
 
             modelBuilder.Entity("DiscordClone.Api.Entities.RoleVoiceChannelPermission", b =>
                 {
-                    b.HasBaseType("DiscordClone.Api.Entities.Base.BaseRolePermission");
+                    b.HasBaseType("DiscordClone.Api.Entities.BaseRolePermission");
 
                     b.Property<int>("EntityId")
                         .HasColumnType("int");
@@ -876,18 +882,14 @@ namespace DiscordClone.Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DiscordClone.Api.Entities.GroupChat", "GroupChat")
+                    b.HasOne("DiscordClone.Api.Entities.BaseChat<DiscordClone.Api.Entities.GroupChatMessage, DiscordClone.Api.Entities.AccountGroupChat>", null)
                         .WithMany("ChatRelations")
-                        .HasForeignKey("ChatId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("BaseChatId");
 
                     b.Navigation("Account");
-
-                    b.Navigation("GroupChat");
                 });
 
-            modelBuilder.Entity("DiscordClone.Api.Entities.Base.BaseMessage<DiscordClone.Api.Entities.Chat, System.Guid>", b =>
+            modelBuilder.Entity("DiscordClone.Api.Entities.BaseMessage<DiscordClone.Api.Entities.Chat, System.Guid>", b =>
                 {
                     b.HasOne("DiscordClone.Api.Entities.Account", "Account")
                         .WithMany()
@@ -898,7 +900,7 @@ namespace DiscordClone.Api.Migrations
                     b.Navigation("Account");
                 });
 
-            modelBuilder.Entity("DiscordClone.Api.Entities.Base.BaseMessage<DiscordClone.Api.Entities.GroupChat, System.Guid>", b =>
+            modelBuilder.Entity("DiscordClone.Api.Entities.BaseMessage<DiscordClone.Api.Entities.GroupChat, System.Guid>", b =>
                 {
                     b.HasOne("DiscordClone.Api.Entities.Account", "Account")
                         .WithMany()
@@ -909,11 +911,11 @@ namespace DiscordClone.Api.Migrations
                     b.Navigation("Account");
                 });
 
-            modelBuilder.Entity("DiscordClone.Api.Entities.Base.BaseRolePermission", b =>
+            modelBuilder.Entity("DiscordClone.Api.Entities.BaseRolePermission", b =>
                 {
-                    b.HasOne("DiscordClone.Api.Entities.Base.BasePermission", "Permission")
+                    b.HasOne("DiscordClone.Api.Entities.BasePermission", "Permission")
                         .WithOne()
-                        .HasForeignKey("DiscordClone.Api.Entities.Base.BaseRolePermission", "PermissionId")
+                        .HasForeignKey("DiscordClone.Api.Entities.BaseRolePermission", "PermissionId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
@@ -1031,10 +1033,10 @@ namespace DiscordClone.Api.Migrations
 
             modelBuilder.Entity("DiscordClone.Api.Entities.GroupChat", b =>
                 {
-                    b.HasOne("DiscordClone.Api.Entities.Account", "Owner")
-                        .WithOne()
+                    b.HasOne("DiscordClone.Api.Entities.AccountGroupChat", "Owner")
+                        .WithOne("GroupChat")
                         .HasForeignKey("DiscordClone.Api.Entities.GroupChat", "OwnerId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Owner");
@@ -1100,7 +1102,7 @@ namespace DiscordClone.Api.Migrations
                     b.HasOne("DiscordClone.Api.Entities.Chat", "Chat")
                         .WithMany("Messages")
                         .HasForeignKey("ChatId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Chat");
@@ -1122,7 +1124,7 @@ namespace DiscordClone.Api.Migrations
                     b.HasOne("DiscordClone.Api.Entities.ChatMessage", "Message")
                         .WithMany("MessageAttachments")
                         .HasForeignKey("MessageId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Message");
@@ -1229,6 +1231,11 @@ namespace DiscordClone.Api.Migrations
                     b.Navigation("Role");
                 });
 
+            modelBuilder.Entity("DiscordClone.Api.Entities.BaseChat<DiscordClone.Api.Entities.GroupChatMessage, DiscordClone.Api.Entities.AccountGroupChat>", b =>
+                {
+                    b.Navigation("ChatRelations");
+                });
+
             modelBuilder.Entity("DiscordClone.Api.Entities.User", b =>
                 {
                     b.Navigation("Account");
@@ -1243,6 +1250,12 @@ namespace DiscordClone.Api.Migrations
                     b.Navigation("Friends");
 
                     b.Navigation("ServerProfiles");
+                });
+
+            modelBuilder.Entity("DiscordClone.Api.Entities.AccountGroupChat", b =>
+                {
+                    b.Navigation("GroupChat")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("DiscordClone.Api.Entities.PreviousRegisteredEmailLookup", b =>
@@ -1296,8 +1309,6 @@ namespace DiscordClone.Api.Migrations
 
             modelBuilder.Entity("DiscordClone.Api.Entities.GroupChat", b =>
                 {
-                    b.Navigation("ChatRelations");
-
                     b.Navigation("Messages");
                 });
 

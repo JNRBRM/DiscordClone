@@ -1,5 +1,5 @@
 ﻿using DiscordClone.Api.DBContext;
-using DiscordClone.Api.Entities;
+using DiscordClone.Api.Entities.Base;
 using DiscordClone.Api.Interface;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;

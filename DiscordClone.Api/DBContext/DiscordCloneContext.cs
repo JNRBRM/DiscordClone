@@ -1,5 +1,6 @@
 ﻿using DiscordClone.Api.Entities;
-using DiscordClone.Api.Entities.Test;
+using DiscordClone.Api.Entities.Base;
+using DiscordClone.Api.Entities.ServerRelated;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using System;
@@ -178,20 +179,29 @@ namespace DiscordClone.Api.DBContext
                 model.Property(x => x.DisplayName).HasMaxLength(32).IsRequired(true);
                 model.Property(x => x.CreatedDate).HasDefaultValueSql("getdate()").IsRequired(true);
                 model.Property(x => x.LastLogonDate).IsRequired(false);
-                model.HasMany(x => x.AccountChats).WithOne(x => x.Account).HasForeignKey(x => x.AccountId).IsRequired(true);
-                model.HasMany(x => x.AccountGroupChats).WithOne(x => x.Account).HasForeignKey(x => x.AccountId).IsRequired(true);
                 model.HasMany(x => x.ServerProfiles).WithOne(x => x.Account).HasForeignKey(x => x.AccountId).IsRequired(true);
                 model.HasOne(x => x.Image).WithOne().HasForeignKey<Account>(x => x.ImageId);
             });
             modelBuilder.Entity<Account>().ToTable("Accounts");
+            modelBuilder.Entity<AccountChat>(model =>
+            {
+                model.HasOne(x => x.Account).WithMany(x => x.AccountChats).HasForeignKey(x => x.AccountId).IsRequired(true).OnDelete(DeleteBehavior.Cascade);
+                model.HasOne(x => x.Chat).WithMany(x => x.ChatRelations).HasForeignKey(x => x.ChatId).IsRequired(true).OnDelete(DeleteBehavior.Cascade);
+            });
+            modelBuilder.Entity<AccountGroupChat>(model =>
+            {
+                model.HasOne(x => x.Account).WithMany(x => x.AccountGroupChats).HasForeignKey(x => x.AccountId).IsRequired(true).OnDelete(DeleteBehavior.Cascade);
+                model.HasOne(x => x.GroupChat).WithMany(x => x.ChatRelations).HasForeignKey(x => x.ChatId).IsRequired(true).OnDelete(DeleteBehavior.Cascade);
+            });
+            modelBuilder.Entity<AccountChat>().ToTable("AccountChats");
+            modelBuilder.Entity<AccountGroupChat>().ToTable("AccountGroupChats");
             modelBuilder.Entity<AccountImage>().ToTable("AccountImages");
             modelBuilder.Entity<ChannelPermission>().ToTable("ChannelPermissions");
-
             modelBuilder.Entity<Chat>().ToTable("Chats");
             modelBuilder.Entity<ChatMessage>(model =>
             {
-                model.HasMany(x => x.MessageAttachments).WithOne(x => x.Message).HasForeignKey(x => x.MessageId).OnDelete(DeleteBehavior.NoAction);
-                model.HasOne(x => x.Chat).WithMany(x => x.Messages).HasForeignKey(x => x.ChatId).OnDelete(DeleteBehavior.NoAction);
+                model.HasMany(x => x.MessageAttachments).WithOne(x => x.Message).HasForeignKey(x => x.MessageId).OnDelete(DeleteBehavior.Cascade);
+                model.HasOne(x => x.Chat).WithMany(x => x.Messages).HasForeignKey(x => x.ChatId).OnDelete(DeleteBehavior.Cascade);
             });
             modelBuilder.Entity<ChatMessage>().ToTable("ChatMessages");
             modelBuilder.Entity<ChatMessageAttachment>().ToTable("ChatMessageAttachments");
@@ -214,7 +224,7 @@ namespace DiscordClone.Api.DBContext
             modelBuilder.Entity<GroupChat>(model =>
             {
                 model.Property(x => x.Name).HasMaxLength(100);
-                model.HasOne(x => x.Owner).WithOne(x => x.GroupChat).HasForeignKey<GroupChat>(x => x.OwnerId).IsRequired();
+                model.HasOne(x => x.Owner).WithOne().HasForeignKey<GroupChat>(x => x.OwnerId).OnDelete(DeleteBehavior.NoAction).IsRequired();
             });
             modelBuilder.Entity<GroupChat>().ToTable("GroupChats");
             modelBuilder.Entity<GroupChatMessage>(model =>
@@ -361,7 +371,7 @@ namespace DiscordClone.Api.DBContext
             modelBuilder.Entity<VoiceChannel>().ToTable("VoiceChannels");
             modelBuilder.Entity<VoiceChannelSetting>(model =>
             {
-                model.HasOne(x => (VoiceChannel)x.Channel).WithMany(x => x.VoiceChannelSettings).HasForeignKey(x => x.ChannelId).OnDelete(DeleteBehavior.NoAction).IsRequired();
+                model.HasOne(x => x.Channel).WithMany(x => x.VoiceChannelSettings).HasForeignKey(x => x.ChannelId).OnDelete(DeleteBehavior.NoAction).IsRequired();
             });
             modelBuilder.Entity<VoiceChannelSetting>().ToTable("VoiceChannelSettings");
             #endregion
