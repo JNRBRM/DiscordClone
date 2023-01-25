@@ -115,7 +115,7 @@ namespace DiscordClone.Api.handlers
                     }
                     else if (!handlers.TryGetValue(property.PropertyType, out Action<T, Claim> handler))
                     {
-                        continue;
+                            continue;
                         handler(obj, claim);
                     }
                 }
